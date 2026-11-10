@@ -273,3 +273,26 @@ def frame_ornaments(p, r, color, k=1.0):
     p.drawEllipse(QPointF(x + 3 * k, y + 3 * k), 1.2 * k, 1.2 * k)
     p.drawEllipse(QPointF(r.center().x(), r.bottom()), 1.6 * k, 1.6 * k)
     p.restore()
+
+
+def clip_icon(size, color):
+    """回形针。"""
+    pix = QPixmap(size, size)
+    pix.fill(Qt.transparent)
+    p = QPainter(pix)
+    p.setRenderHint(QPainter.Antialiasing)
+    pen = QPen(QColor(color), size / 13)
+    pen.setCapStyle(Qt.RoundCap)
+    p.setPen(pen)
+    p.translate(size / 2, size / 2)
+    p.rotate(40)
+    s = size / 22
+    path = QPainterPath(QPointF(2 * s, 4 * s))            # 一笔画：内弯 → 外圈 → 收尾
+    path.lineTo(QPointF(2 * s, -5 * s))
+    path.arcTo(QRectF(-4 * s, -8 * s, 6 * s, 6 * s), 0, 180)
+    path.lineTo(QPointF(-4 * s, 6 * s))
+    path.arcTo(QRectF(-4 * s, 2 * s, 8 * s, 8 * s), 180, 180)
+    path.lineTo(QPointF(4 * s, -7 * s))
+    p.drawPath(path)
+    p.end()
+    return pix

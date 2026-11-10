@@ -7,12 +7,12 @@ import type { Register } from 'claude-code'
 // state: working | reading | waiting | done | error | idle | ended
 // 每 60 秒心跳重写一次；桌宠把 3 分钟没更新的文件当作已退出。
 //
-// 聊天：~/.cache/desk-pet/chat/<sessionId>.in.json  桌宠写 {msgs:[{id,text}|{id,answer:{qid,answers}}|{id,terminal:qid}]}
+// 聊天：~/.cache/desk-pet/chat/<sessionId>.in.json  桌宠写 {msgs:[{id,text,prompt?,media?}|{id,answer:{qid,answers}}|{id,terminal:qid}]}
 //       ~/.cache/desk-pet/chat/<sessionId>.out.json mod 写 {ack, log:[{id,role,text,src,ts}], ask, perm}
 // 从桌宠发来的那一轮里，CC 的提问（选项）改到桌宠窗口回答（桌宠退出了就回到终端）。
 // 权限确认始终在终端里点；桌宠窗口只提醒。
 type State = 'working' | 'reading' | 'waiting' | 'done' | 'error' | 'idle' | 'ended'
-type Entry = { id: number; role: 'user' | 'cc'; text: string; src: 'pet' | 'terminal'; ts: number }
+type Entry = { id: number; role: 'user' | 'cc'; text: string; src: 'pet' | 'terminal'; ts: number; media?: any[] }
 type Ask = { qid: string; questions: any[] }
 
 const ASKS_USER = new Set(['AskUserQuestion', 'ExitPlanMode'])
@@ -72,11 +72,11 @@ async function writeOut($: any) {
   } catch {}
 }
 
-async function addLog($: any, role: Entry['role'], text: string, src: Entry['src']) {
-  if (!text.trim()) return
+async function addLog($: any, role: Entry['role'], text: string, src: Entry['src'], media?: any[]) {
+  if (!text.trim() && !media?.length) return
   const ts = await $.clock.now()
   nextId = Math.max(nextId + 1, ts)
-  chatLog.push({ id: nextId, role, text, src, ts })
+  chatLog.push({ id: nextId, role, text, src, ts, ...(media?.length ? { media } : {}) })
   if (chatLog.length > 40) chatLog = chatLog.slice(-40)
   await writeOut($)
 }
@@ -96,10 +96,12 @@ async function pollInbox($: any) {
     if (typeof m.id !== 'number' || m.id <= ack) continue
     ack = m.id
     changed = true
-    if (typeof m.text === 'string' && m.text.trim()) {
-      await addLog($, 'user', m.text, 'pet')
-      petTexts.push(m.text.trim())
-      void $.prompt.submit({ text: m.text, asUser: true })
+    // 一条消息：显示用 text（和图片 media），发给 CC 用 prompt（带图片路径）
+    const prompt = typeof m.prompt === 'string' && m.prompt.trim() ? m.prompt : typeof m.text === 'string' ? m.text : ''
+    if (prompt.trim()) {
+      await addLog($, 'user', m.text ?? '', 'pet', Array.isArray(m.media) ? m.media : undefined)
+      petTexts.push(prompt.trim())
+      void $.prompt.submit({ text: prompt, asUser: true })
     } else if (m.answer) answers.set(m.answer.qid, { answers: m.answer.answers })
     else if (m.terminal) answers.set(m.terminal, { terminal: true })
   }

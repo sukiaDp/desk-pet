@@ -30,6 +30,7 @@ DEFAULT = {
         'send': '发送', 'submit': '提交', 'back_to_terminal': '回终端答', 'from_terminal': '在终端里发的',
         'sending': '（发送中…）', 'perm': '终端里在等你批准：{tool}（权限只能在终端里点）',
         'new_reply': '有新回复，点我看', 'no_session': '没有开 /desk-pet 的会话：在 CC 里输入 /desk-pet',
+        'image_note': '（附上了 {n} 张图片，请用 Read 工具查看：\n{paths}）',
     },
 }
 

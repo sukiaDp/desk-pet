@@ -1,6 +1,6 @@
 {
   "name": "desk-pet",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "按会话把 CC 状态写到 ~/.cache/desk-pet/sessions 给桌宠读；/desk-pet 开关",
   "types": "./types/index.d.ts"
 }

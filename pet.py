@@ -9,6 +9,7 @@ import json
 import math
 import os
 import random
+import shutil
 import sys
 import time
 from pathlib import Path
@@ -123,6 +124,7 @@ def cc_state():
             p.unlink(missing_ok=True)
             for f in (SESSIONS.parent / 'chat').glob(f'{p.stem}.*'):   # 这个会话的聊天文件也清掉
                 f.unlink(missing_ok=True)
+            shutil.rmtree(SESSIONS.parent / 'media' / p.stem, ignore_errors=True)   # 发过的图片也清掉
             continue
         if age > 180:
             continue

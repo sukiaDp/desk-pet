@@ -5,20 +5,24 @@
   <会话id>.out.json  mod 写：{ack, log: [{id, role, text, src, ts}], ask: {qid, questions} | null, perm: 工具名 | null}
 权限确认只能在终端里点，这里只提醒。
 """
+import html
 import json
 import os
 import re
+import shutil
 import time
 from pathlib import Path
 
-from PySide6.QtCore import QRectF, QSize, Qt, QTimer
-from PySide6.QtGui import QColor, QFont, QFontMetrics, QIcon, QGuiApplication, QPainter, QPainterPath, QPixmap
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel, QLineEdit, QPushButton,
+from PySide6.QtCore import QEvent, QRectF, QSize, Qt, QTimer, QUrl
+from PySide6.QtGui import QColor, QFont, QFontMetrics, QIcon, QImage, QKeySequence, QGuiApplication, QPainter, QPainterPath, QPixmap
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFileDialog, QFrame, QHBoxLayout, QLabel, QLineEdit, QPushButton,
                                QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
 import book
 
 CHAT = Path.home() / '.cache/desk-pet/chat'
+MEDIA = Path.home() / '.cache/desk-pet/media'      # 发出去的图片：media/<会话id>/
+IMAGE_EXT = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp'}
 # 聊天窗大小：(宽, 高, 字号倍数)；托盘「设置 → 聊天窗大小」切换
 SIZES = {'small': (440, 700, 1.0), 'medium': (560, 880, 1.25), 'large': (680, 1060, 1.5)}
 SIZE_LABEL = {'small': '小', 'medium': '中', 'large': '大'}
@@ -68,6 +72,10 @@ QPushButton#send {{ padding: 0; border-radius: 19px; font-size: 20px; color: {c[
   background: qradialgradient(cx:0.4, cy:0.35, radius:0.8, stop:0 {QColor(c['rubric']).lighter(135).name()}, stop:1 {QColor(c['rubric']).darker(140).name()});
   border: 2px solid {QColor(c['rubric']).darker(160).name()}; }}
 QPushButton#send:disabled {{ background: {c['border']}; color: {c['muted']}; border-color: {c['border']}; }}
+QPushButton#clip {{ background: transparent; border: none; padding: 0; }}
+QPushButton#clip:hover {{ background: {rgba(c['gold'], 0.18)}; border-radius: 6px; }}
+QLabel#thumb {{ border: 1px solid {c['gold']}; border-radius: 3px; }}
+QPushButton#unthumb {{ color: #fff; background: rgba(0,0,0,0.55); border: none; border-radius: 3px; padding: 0; font-size: 11px; }}
 QPushButton#close {{ color: {c['muted']}; background: transparent; border: none; padding: 0; font-size: 15px; }}
 QPushButton#close:hover {{ color: {c['rubric']}; }}
 """
@@ -112,6 +120,10 @@ QLineEdit {{ color: {c['ink']}; padding: 7px 11px; border: 1px solid {c['border'
 QLineEdit:focus {{ border-color: {c['gold']}; }}
 QPushButton#send {{ padding: 6px 16px; border-radius: 15px; background: {c['accent']}; color: {c['accent_ink']}; border: 1px solid {c['gold']}; }}
 QPushButton#send:disabled {{ background: {c['border']}; color: {c['muted']}; border-color: {c['border']}; }}
+QPushButton#clip {{ background: transparent; border: none; padding: 0; }}
+QPushButton#clip:hover {{ background: {rgba(c['gold'], 0.18)}; border-radius: 6px; }}
+QLabel#thumb {{ border: 1px solid {c['gold']}; border-radius: 3px; }}
+QPushButton#unthumb {{ color: #fff; background: rgba(0,0,0,0.55); border: none; border-radius: 3px; padding: 0; font-size: 11px; }}
 """
 
 
@@ -227,8 +239,21 @@ class ChatWindow(QWidget):
         self.btn = QPushButton(self.tx['send'])
         self.btn.setObjectName('send')
         self.btn.clicked.connect(self.on_send)
+        self.clip = QPushButton()                # 回形针：选图片
+        self.clip.setObjectName('clip')
+        self.clip.setCursor(Qt.PointingHandCursor)
+        self.clip.setToolTip('附上图片（也可以拖进来，或在输入框里粘贴截图）')
+        self.clip.clicked.connect(self.pick_images)
+        bottom.addWidget(self.clip)
         bottom.addWidget(self.input, 1)
         bottom.addWidget(self.btn)
+        self.pending_imgs = []                   # 待发图片：[(QImage 或 None, 源文件路径 或 None)]
+        self.tray = QWidget()                    # 待发缩略图一排
+        self.tray_row = QHBoxLayout(self.tray)
+        self.tray_row.setContentsMargins(0, 0, 0, 0)
+        self.tray.hide()
+        self.input.installEventFilter(self)      # 粘贴截图
+        self.setAcceptDrops(True)                # 拖图片进来
 
         lay = QVBoxLayout(self)
         if self.book:                            # 内容放在纸页里，顶上留给标题
@@ -238,6 +263,7 @@ class ChatWindow(QWidget):
         lay.addLayout(top)
         lay.addWidget(self.perm)
         lay.addWidget(self.scroll, 1)
+        lay.addWidget(self.tray)
         lay.addLayout(bottom)
         self.apply_size(size)
 
@@ -261,6 +287,11 @@ class ChatWindow(QWidget):
             if not self.btn.text():
                 self.btn.setIcon(QIcon(book.seal_icon(round(22 * k), self.t['colors']['accent_ink'])))
                 self.btn.setIconSize(QSize(round(22 * k), round(22 * k)))
+        n = round(34 * k)                         # 回形针按钮
+        self.clip.setFixedSize(n, n)
+        self.clip.setIcon(QIcon(book.clip_icon(round(22 * k), self.t['colors']['muted'])))
+        self.clip.setIconSize(QSize(round(22 * k), round(22 * k)))
+        self.draw_tray()
         self.resize(w, h)
         self.shown_key = None                    # 头像、气泡宽度都变了：重画对话
         self.refresh()
@@ -337,7 +368,7 @@ class ChatWindow(QWidget):
         out = read_json(CHAT / f'{self.sid}.out.json') or {}
         ack = out.get('ack', 0)
         pending = [m for m in (read_json(CHAT / f'{self.sid}.in.json') or {}).get('msgs', [])
-                   if m.get('id', 0) > ack and m.get('text')]
+                   if m.get('id', 0) > ack and (m.get('text') or m.get('media'))]
         self.draw(out.get('log', []), out.get('ask'), out.get('perm'), pending)
         if self.isVisible():
             self.seen[self.sid] = max([e['id'] for e in out.get('log', []) if e.get('role') == 'cc'] or [0])
@@ -357,14 +388,15 @@ class ChatWindow(QWidget):
                 w.deleteLater()
         if not log and not pending:
             self.add_note(self.tx['empty'])
-        items = [(e['role'], e['text'], e.get('src'), False) for e in log] + [('user', m['text'], None, True) for m in pending]
-        for i, (role, text, src, pend) in enumerate(items):
+        items = [(e['role'], e['text'], e.get('src'), False, e.get('media')) for e in log] + \
+                [('user', m.get('text', ''), None, True, m.get('media')) for m in pending]
+        for i, (role, text, src, pend, media) in enumerate(items):
             if self.book and role == 'user' and i > 0:   # 每段问答之间一个小花饰
                 sep = QLabel()
                 sep.setPixmap(book.divider(round(150 * self.k), self.t['colors']['gold'], self.t['colors']['rubric']))
                 sep.setAlignment(Qt.AlignCenter)
                 self.list.addWidget(sep)
-            self.add_msg(role, text, src=src, pending=pend)
+            self.add_msg(role, text, src=src, pending=pend, media=media)
         self.list.addWidget(self.ask)            # 提问接在对话后面，跟着一起滚动
         self.draw_ask(ask)
         bar = self.scroll.verticalScrollBar()       # 等布局排好再滚到底
@@ -377,13 +409,24 @@ class ChatWindow(QWidget):
         n.setAlignment(Qt.AlignCenter)
         self.list.addWidget(n)
 
-    def add_msg(self, role, text, src=None, pending=False):
+    def add_msg(self, role, text, src=None, pending=False, media=None):
         c = self.t['colors']
         b = Framed(c['rubric'] if role == 'user' else c['gold'], self.k) if self.book else QLabel()
         b.setProperty('role', role)
         b.setProperty('pending', 'true' if pending else 'false')
-        b.setTextFormat(Qt.MarkdownText if role == 'cc' else Qt.PlainText)
-        b.setText(text + ('\n' + self.tx['sending'] if pending else ''))
+        imgs = [m['path'] for m in media or [] if m.get('kind') == 'image' and Path(m.get('path', '')).exists()]
+        if imgs:                                 # 带图：文字 + 缩略图，点图用系统看图打开
+            w = round(150 * self.k)
+            pics = ' '.join(f'<a href="{QUrl.fromLocalFile(p).toString()}"><img src="{QUrl.fromLocalFile(p).toString()}" width="{w}"></a>'
+                            for p in imgs)
+            body = html.escape(text).replace('\n', '<br>')
+            align = 'right' if self.book and role == 'user' else 'left'
+            b.setTextFormat(Qt.RichText)
+            b.setText(f'<div align="{align}">{body}{"<br>" if body else ""}{pics}'
+                      f'{"<br>" + html.escape(self.tx["sending"]) if pending else ""}</div>')
+        else:
+            b.setTextFormat(Qt.MarkdownText if role == 'cc' else Qt.PlainText)
+            b.setText(text + ('\n' + self.tx['sending'] if pending else ''))
         b.setWordWrap(True)
         b.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.LinksAccessibleByMouse)
         b.setOpenExternalLinks(True)
@@ -398,7 +441,9 @@ class ChatWindow(QWidget):
         f.setPixelSize(round((14 if self.book else 13) * self.k))
         f.setItalic(self.book and role == 'user')
         fm = QFontMetrics(f)
-        longest = max((fm.horizontalAdvance(line) for line in b.text().splitlines() or ['']), default=0)
+        longest = max((fm.horizontalAdvance(line) for line in text.splitlines() or ['']), default=0)
+        if imgs:                                 # 缩略图一行排几张
+            longest = max(longest, min(len(imgs), 3) * (round(150 * self.k) + 6))
         b.setMinimumWidth(min(int(longest * 1.05) + round(44 * self.k), maxw))   # 加上文字框的内边距和边框，留点余量
         if self.book and role == 'user':
             b.setAlignment(Qt.AlignRight)
@@ -513,11 +558,94 @@ class ChatWindow(QWidget):
     # ---- 发消息 ----
     def on_send(self):
         text = self.input.text().strip()
-        if not text or not self.sid:
+        if not (text or self.pending_imgs) or not self.sid:
             return
-        send(self.sid, {'text': text})
+        item = {'text': text}
+        if self.pending_imgs:                    # 图片存到 media/<会话>/，消息里写上路径，CC 用 Read 看
+            d = MEDIA / self.sid
+            d.mkdir(parents=True, exist_ok=True)
+            stamp, paths = int(time.time() * 1000), []
+            for i, (img, src) in enumerate(self.pending_imgs):
+                if src:
+                    dst = d / f'{stamp}-{i}{Path(src).suffix.lower()}'
+                    shutil.copyfile(src, dst)
+                else:
+                    dst = d / f'{stamp}-{i}.png'
+                    img.save(str(dst), 'PNG')
+                paths.append(str(dst))
+            item['media'] = [{'kind': 'image', 'path': p} for p in paths]
+            note = self.tx['image_note'].format(n=len(paths), paths='\n'.join(paths))
+            item['prompt'] = f'{text}\n\n{note}' if text else note
+            self.pending_imgs = []
+            self.draw_tray()
+        send(self.sid, item)
         self.input.clear()
         self.refresh()
+
+    # ---- 图片：选、拖、粘贴 ----
+    def pick_images(self):
+        files, _ = QFileDialog.getOpenFileNames(self, '选图片', str(Path.home()),
+                                                '图片 (' + ' '.join(f'*{e}' for e in sorted(IMAGE_EXT)) + ')')
+        for f in files:
+            self.add_image(src=f)
+
+    def add_image(self, img=None, src=None):
+        if src and Path(src).suffix.lower() not in IMAGE_EXT:
+            return
+        if img is None and src:
+            img = QImage(src)
+        if img is None or img.isNull():
+            return
+        self.pending_imgs.append((img, src))
+        self.draw_tray()
+
+    def draw_tray(self):
+        while self.tray_row.count():
+            w = self.tray_row.takeAt(0).widget()
+            if w:
+                w.deleteLater()
+        n = round(54 * self.k)
+        for i, (img, _) in enumerate(self.pending_imgs):
+            cell = QLabel()
+            cell.setPixmap(QPixmap.fromImage(img).scaled(n, n, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation).copy(0, 0, n, n))
+            cell.setFixedSize(n, n)
+            cell.setObjectName('thumb')
+            x = QPushButton('✕', cell)           # 右上角小叉：拿掉这张
+            x.setObjectName('unthumb')
+            x.setFixedSize(round(18 * self.k), round(18 * self.k))
+            x.move(n - x.width(), 0)
+            x.setCursor(Qt.PointingHandCursor)
+            x.clicked.connect(lambda _=False, i=i: (self.pending_imgs.pop(i), self.draw_tray()))
+            self.tray_row.addWidget(cell)
+        self.tray_row.addStretch(1)
+        self.tray.setVisible(bool(self.pending_imgs))
+
+    def eventFilter(self, obj, e):
+        if obj is self.input and e.type() == QEvent.KeyPress and e.matches(QKeySequence.Paste):
+            md = QApplication.clipboard().mimeData()
+            if md.hasImage():                    # 剪贴板里是截图
+                self.add_image(img=QImage(md.imageData()))
+                return True
+            files = [u.toLocalFile() for u in md.urls() if Path(u.toLocalFile()).suffix.lower() in IMAGE_EXT]
+            if files:                            # 复制的是图片文件
+                for f in files:
+                    self.add_image(src=f)
+                return True
+        return super().eventFilter(obj, e)
+
+    def dragEnterEvent(self, e):
+        md = e.mimeData()
+        if md.hasImage() or any(Path(u.toLocalFile()).suffix.lower() in IMAGE_EXT for u in md.urls()):
+            e.acceptProposedAction()
+
+    def dropEvent(self, e):
+        md = e.mimeData()
+        files = [u.toLocalFile() for u in md.urls() if Path(u.toLocalFile()).suffix.lower() in IMAGE_EXT]
+        for f in files:
+            self.add_image(src=f)
+        if not files and md.hasImage():
+            self.add_image(img=QImage(md.imageData()))
+        e.acceptProposedAction()
 
     # ---- 书页外观：画背景、标题；拖封面移动 ----
     def paintEvent(self, e):
