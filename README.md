@@ -10,7 +10,9 @@
 
 ## 和 CC 联动
 
-`cc-mod/` 是一个 CC mod（已装在用户级：`desk-pet@local-mods`）。每个会话把状态写到
+`cc-mod/` 是一个 CC mod（已装在用户级：`desk-pet@local-mods`），**按会话开启**：默认不推送，在会话里输入 `/desk-pet` 打开、再输入一次关闭（也可以 `/desk-pet on|off`）；用 `DESK_PET=1 claude` 启动的会话默认打开。打开时状态栏显示「桌宠：开」。
+
+打开的会话把状态写到
 `~/.cache/desk-pet/sessions/<会话id>.json`，每 60 秒写一次心跳。桌宠每秒读一次、汇总，优先级：等你回复 > 出错 > 工作中 > 查看中 > 完成 > 空闲。
 3 分钟没有心跳的会话不计入；完成、出错超过 2 分钟算空闲。
 
@@ -29,4 +31,4 @@
 
 缺素材的动画会自动跳过。调试：`DESK_PET_DEBUG=1` 时把动画切换打到 stderr，并把空闲计时缩成 8 秒 / 16 秒。
 
-开关 mod：`claude plugin disable desk-pet@local-mods` / `claude plugin enable desk-pet@local-mods`（新会话生效）。
+整个 mod 停用 / 启用：`claude plugin disable desk-pet@local-mods` / `claude plugin enable desk-pet@local-mods`（新会话生效）。

@@ -1,1 +1,1 @@
-{ "name": "desk-pet", "version": "0.3.0", "description": "把会话状态写到 ~/.cache/desk-pet/sessions，给桌宠读" }
+{ "name": "desk-pet", "version": "0.4.0", "description": "把会话状态写到 ~/.cache/desk-pet/sessions，给桌宠读" }
