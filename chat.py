@@ -13,7 +13,7 @@ import shutil
 import time
 from pathlib import Path
 
-from PySide6.QtCore import QEvent, QRectF, QSize, Qt, QTimer, QUrl
+from PySide6.QtCore import QAbstractAnimation, QEasingCurve, QEvent, QPropertyAnimation, QRectF, QSize, Qt, QTimer, QUrl
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QIcon, QImage, QKeySequence, QPalette, QTextDocument, QGuiApplication, QPainter, QPainterPath, QPixmap
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFileDialog, QFrame, QHBoxLayout, QLabel, QLineEdit, QPushButton,
                                QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
@@ -295,6 +295,12 @@ class ChatWindow(QWidget):
         self.down.clicked.connect(self.to_bottom)
         self.down.hide()
         self.new_below, self.force_bottom = False, False
+        self.anim = QPropertyAnimation(self.scroll.verticalScrollBar(), b'value', self)   # 平滑滚动
+        self.anim.setDuration(260)
+        self.anim.setEasingCurve(QEasingCurve.OutCubic)
+        self.anim.finished.connect(self.anim_done)
+        self.stick, self.target = False, 0
+        self.scroll.viewport().installEventFilter(self)
         self.act = QLabel()                      # 页尾一行：CC 正在做什么
         self.act.setObjectName('activity')
         self.act.hide()
@@ -498,8 +504,12 @@ class ChatWindow(QWidget):
         def settle():
             if keep is not None:
                 bar.setValue(bar.maximum() - keep)
-            elif was_bottom:
+            elif fresh:                          # 刚打开 / 换会话 / 自己发了消息：直接到底
+                self.anim.stop()
                 bar.setValue(bar.maximum())
+            elif was_bottom:                     # 本来就在底下：从原位置平滑滑到底
+                bar.setValue(old_val)
+                self.smooth_to(bar.maximum(), stick=True)
             else:
                 bar.setValue(old_val)
             self.update_down()
@@ -529,11 +539,38 @@ class ChatWindow(QWidget):
 
     def at_bottom(self):
         bar = self.scroll.verticalScrollBar()
+        if self.stick and self.anim.state() == QAbstractAnimation.Running:
+            return True                          # 正在滑向底部：算在底部
         return bar.value() >= bar.maximum() - round(6 * self.k)
 
     def to_bottom(self):
+        self.smooth_to(self.scroll.verticalScrollBar().maximum(), stick=True)
+
+    # ---- 平滑滚动：滚轮、回到底部都用动画滑过去 ----
+    def smooth_to(self, v, stick=False):
         bar = self.scroll.verticalScrollBar()
-        bar.setValue(bar.maximum())
+        v = max(bar.minimum(), min(bar.maximum(), int(v)))
+        self.anim.stop()
+        self.stick, self.target = stick, v
+        self.anim.setStartValue(bar.value())
+        self.anim.setEndValue(v)
+        self.anim.start()
+
+    def anim_done(self):
+        bar = self.scroll.verticalScrollBar()
+        if self.stick and bar.value() < bar.maximum():   # 滑的途中内容又变长了：补到真正的底
+            bar.setValue(bar.maximum())
+        self.stick = False
+        self.update_down()
+
+    def wheel(self, e):
+        """鼠标滚轮：一格滑一段，带缓动；连续滚就往同一个目标累加。触摸板（有像素增量）照常。"""
+        if not e.pixelDelta().isNull() or not e.angleDelta().y():
+            return False
+        bar = self.scroll.verticalScrollBar()
+        base = self.target if self.anim.state() == QAbstractAnimation.Running else bar.value()
+        self.smooth_to(base - e.angleDelta().y() / 120 * round(90 * self.k))
+        return True
 
     def update_down(self):
         """右下角的「回到底部」：不在最底下才显示；翻着看时来了新消息就写上「新消息」。"""
@@ -836,6 +873,8 @@ class ChatWindow(QWidget):
         self.tray.setVisible(bool(self.pending_imgs or self.pending_files))
 
     def eventFilter(self, obj, e):
+        if obj is self.scroll.viewport() and e.type() == QEvent.Wheel:
+            return self.wheel(e)
         if obj is self.input and e.type() == QEvent.KeyPress and e.matches(QKeySequence.Paste):
             md = QApplication.clipboard().mimeData()
             if md.hasImage():                    # 剪贴板里是截图
