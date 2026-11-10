@@ -21,7 +21,7 @@
 | 工作中 | running（专注工作） |
 | 查看中（读文件、搜索） | review（低头检查） |
 | 等你回复（权限、提问） | 先 startled-avert（吓一跳），再 waiting；超过 1 分钟没人理 → bored-wait（无聊等待） |
-| 完成 | 先 jumping（跳一下），再 waving（招手） |
+| 完成 | 先 jumping（跳一下），再 waving（招手），约 6 秒后回到待命 |
 | 出错 | failed |
 | 空闲 | 站着（idle）；偶尔随机 prayer-peek / sneeze / brave-gaze |
 | 闲置 30 分钟以上 | 随机 sit-swing（坐下晃脚）或 sleepy-nod（打瞌睡），保持到 CC 有动静或点她 |

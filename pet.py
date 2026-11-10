@@ -43,6 +43,7 @@ if DEBUG:
 else:
     RANDOM_MS, BORED_MS, LONG_IDLE_MS = (20e3, 40e3), 60e3, 30 * 60e3
 CLICK_CURTSY_MS, CLICK_GAZE_MS = 3000, 8000
+DONE_MS = 6000          # 完成：跳一下 + 招手，约 6 秒后回到待命
 
 T0 = time.monotonic()
 
@@ -119,6 +120,7 @@ class Pet(QWidget):
         # 目标
         self.cc, self.bubble = 'idle', ''
         self.gaze, self.gaze_until = None, 0     # 点击后的一小段时间里视线跟着鼠标
+        self.done_since = 0
         self.temp = None                         # 临时动作 {key, until, urgent, random}
         self.drag, self.drag_until = None, 0     # 拖动时左右跑
         self.idle_since = self.waiting_since = now_ms()
@@ -151,7 +153,10 @@ class Pet(QWidget):
         self.temp = None
         if self.gaze and now < self.gaze_until:
             return self.gaze
-        if self.cc == 'idle':
+        cc = self.cc
+        if cc == 'done' and now - self.done_since > DONE_MS:
+            cc = 'idle'                          # 招手几秒就够了，之后站着待命、偶尔小动作
+        if cc == 'idle':
             if now - self.idle_since > LONG_IDLE_MS:     # 闲置 30 分钟以上：随机坐下或打瞌睡，保持住
                 if not self.long_idle:
                     self.long_idle = random.choice([k for k in LONG_IDLE if k in self.clips] or [None])
@@ -166,8 +171,8 @@ class Pet(QWidget):
                     self.temp = {'key': k, 'random': True,
                                  'until': None if self.clips[k]['mode'] == 'oneshot' else now + 4000}
                     return {'key': k}
-        k = ANIM[self.cc]
-        if self.cc == 'waiting' and now - self.waiting_since > BORED_MS and 'bored-wait' in self.clips:
+        k = ANIM[cc]
+        if cc == 'waiting' and now - self.waiting_since > BORED_MS and 'bored-wait' in self.clips:
             k = 'bored-wait'                     # 等你回复太久没人理
         if k in self.clips:
             return {'key': k}
@@ -314,6 +319,9 @@ class Pet(QWidget):
                 self.idle_since, self.long_idle = now, None
             if state == 'waiting':
                 self.waiting_since = now
+            if state == 'done':
+                self.done_since = now
+                self.idle_since, self.long_idle = now, None   # 招完手才开始算闲置
         self.cc = state
         if self.praised is not None and praised > self.praised:   # 被夸了：藏脸
             self.temp = {'key': 'hidden-blush', 'until': now + 4500}
