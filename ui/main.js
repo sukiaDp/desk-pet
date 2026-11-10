@@ -68,9 +68,13 @@ function start(t) { cur = t && t.key; flip = !!(t && t.flip); phase = 'enter'; i
 
 function step(now) {
   const t = targetKey();
-  const same = t && cur === t.key && flip === !!t.flip;
+  let same = t && cur === t.key && flip === !!t.flip;
   if (!cur) { if (t) start(t); }
   else {
+    // 视线换方向：直接跳到新方向的保持帧，不回站立；只有开始看和不看了才播 enter / exit
+    if (!same && t && cur.startsWith('gaze:') && t.key.startsWith('gaze:')) {
+      cur = t.key; flip = !!t.flip; phase = 'sustain'; idx = 0; until = 0; same = true;
+    }
     const c = clips[cur], frames = c.phases[phase];
     // 视线保持帧可以马上打断；循环要播完这一圈再退出
     const interrupt = !same && phase === 'sustain' && (c.mode === 'hold' || c.mode === 'parameterized_hold');
