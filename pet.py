@@ -424,7 +424,7 @@ def main():
     app = QApplication(sys.argv)
     app.setApplicationName('desk-pet')
     app.setQuitOnLastWindowClosed(False)
-    theme.register_fonts(THEME)                  # 主题自带字体
+    theme.register_fonts(THEME, CFG.get('font'))  # 主题自带字体；设置里选过哪款就用哪款
     pet = Pet()
     pet.show()
 
@@ -455,6 +455,19 @@ def main():
         a.triggered.connect(lambda _=False, key=key: (save_settings(chat_size=key), pet.chat.apply_size(key)))
         group.addAction(a)
         chat_size.addAction(a)
+    if THEME['font_options']:                     # 字体：马上生效
+        fonts = settings.addMenu('字体')
+        fgroup = QActionGroup(fonts)
+        def set_font(fid):
+            save_settings(font=fid)
+            theme.register_fonts(THEME, fid)
+            pet.chat.apply_size(pet.chat.size_name)  # 重新量字宽、重画
+            pet.render()
+        for o in THEME['font_options']:
+            a = QAction(o['name'], fonts, checkable=True, checked=o['id'] == THEME.get('font_choice'))
+            a.triggered.connect(lambda _=False, fid=o['id']: set_font(fid))
+            fgroup.addAction(a)
+            fonts.addAction(a)
     looks = menu.addMenu('形象')                  # 换形象：记下选择，重启自己
     for tid, name in theme.available():
         a = QAction(name, looks, checkable=True, checked=tid == THEME['id'])

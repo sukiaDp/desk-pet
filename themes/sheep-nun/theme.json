@@ -1,7 +1,54 @@
 {
   "name": "羊角修女",
+  "look": "book",
   "assets": "assets",
   "font": "ZCOOL XiaoWei",
+  "font_default": "xiaowei",
+  "font_latin": "IM FELL English",
+  "font_latin_files": [
+    "fonts/IMFeENrm28P.ttf",
+    "fonts/IMFeENit28P.ttf"
+  ],
+  "font_options": [
+    {
+      "id": "zhuque",
+      "name": "朱雀仿宋（古籍刻本）",
+      "font": "Zhuque Fangsong (technical preview)",
+      "files": [
+        "fonts/ZhuqueFangsong-Regular.ttf"
+      ]
+    },
+    {
+      "id": "wenkai",
+      "name": "霞鹜文楷（手写楷书）",
+      "font": "LXGW WenKai",
+      "files": [
+        "fonts/LXGWWenKai-Regular.ttf"
+      ]
+    },
+    {
+      "id": "xiaowei",
+      "name": "站酷小薇（纤细复古）",
+      "font": "ZCOOL XiaoWei",
+      "files": [
+        "fonts/ZCOOLXiaoWei-Regular.ttf"
+      ]
+    },
+    {
+      "id": "mashanzheng",
+      "name": "马善政（毛笔楷书）",
+      "font": "Ma Shan Zheng",
+      "files": [
+        "fonts/MaShanZheng-Regular.ttf"
+      ]
+    },
+    {
+      "id": "noto",
+      "name": "思源宋体（系统自带）",
+      "font": "Noto Serif CJK SC",
+      "files": []
+    }
+  ],
   "avatar": [
     68,
     2,
@@ -45,12 +92,5 @@
     "new_reply": "有回信啦，点我看",
     "no_session": "没有开 /desk-pet 的会话：在 CC 里输入 /desk-pet",
     "seal": ""
-  },
-  "look": "book",
-  "font_latin": "IM FELL English",
-  "font_files": [
-    "fonts/ZCOOLXiaoWei-Regular.ttf",
-    "fonts/IMFeENrm28P.ttf",
-    "fonts/IMFeENit28P.ttf"
-  ]
+  }
 }

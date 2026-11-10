@@ -17,7 +17,9 @@ DEFAULT = {
     'assets': 'assets',
     'font': '',
     'font_latin': '',               # 西文字体（可选）；中文缺字时用 font 补
-    'font_files': [],               # 主题自带的字体文件，相对主题目录
+    'font_latin_files': [],         # 西文字体文件，相对主题目录
+    'font_options': [],             # 可选的中文字体：[{id, name, font, files}]，托盘「设置 → 字体」切换
+    'font_default': '',             # 默认选哪个（id）
     'avatar': None,                 # [x, y, 边长]：从默认姿态图里裁头像；不写就不显示头像
     'colors': {
         'bg': '#e7ebf0', 'panel': '#ffffff', 'ink': '#222222', 'muted': '#8a929a', 'border': '#c9d3dd',
@@ -76,17 +78,24 @@ def load(theme_id=None):
     t['colors'] = {**DEFAULT['colors'], **raw.get('colors', {})}
     t['text'] = {**DEFAULT['text'], **raw.get('text', {})}
     t['assets'] = Path(os.environ.get('DESK_PET_ASSETS') or d / t['assets'])
-    t['font_files'] = [str(d / f) for f in t['font_files']]
+    t['font_latin_files'] = [str(d / f) for f in t['font_latin_files']]
+    t['font_options'] = [{**o, 'files': [str(d / f) for f in o.get('files', [])]} for o in t['font_options']]
     return t
 
 
-def register_fonts(t):
-    """装上主题自带的字体（要在 QApplication 建好之后调），设成整个程序的默认字体：
-    西文字体排前面，中文缺字时用 font。样式表里只写字号、不写字体，就都用这个。"""
+def register_fonts(t, choice=None):
+    """装上主题自带的字体（要在 QApplication 建好之后调），按 choice（字体选项 id）设成整个程序的默认字体：
+    西文字体排前面，中文缺字时用选中的那款。样式表里只写字号、不写字体，就都用这个。可以随时再调来切换。"""
     from PySide6.QtGui import QFont, QFontDatabase
     from PySide6.QtWidgets import QApplication
-    for f in t['font_files']:
+    # 每次都先清掉再装：Qt 会缓存「缺字用哪个字体补」，只改字体列表的话中文不会跟着换
+    QFontDatabase.removeAllApplicationFonts()
+    for f in t['font_latin_files'] + [f for o in t['font_options'] for f in o['files']]:
         QFontDatabase.addApplicationFont(f)
+    opts = {o['id']: o for o in t['font_options']}
+    pick = opts.get(choice) or opts.get(t['font_default'])
+    if pick:
+        t['font'], t['font_choice'] = pick['font'], pick['id']
     families = [f for f in (t['font_latin'], t['font']) if f]
     if families:
         f = QApplication.font()

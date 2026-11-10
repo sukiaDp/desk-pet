@@ -283,6 +283,7 @@ class ChatWindow(QWidget):
 
     def apply_size(self, name):
         """小 / 中 / 大：窗口、字号、头像、火漆印一起缩放，马上生效。"""
+        self.size_name = name if name in SIZES else 'small'
         w, h, k = SIZES.get(name, SIZES['small'])
         if not self.book:
             w, h = w - 20, h - 20
