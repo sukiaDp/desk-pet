@@ -220,7 +220,7 @@ class ChatWindow(QWidget):
         lay = QVBoxLayout(self)
         if self.book:                            # 内容放在纸页里，顶上留给标题
             b = book.BORDER
-            lay.setContentsMargins(b + 16, b + book.header(bool(self.tx['title'])), b + 5 + 16, b + 5 + 12)
+            lay.setContentsMargins(b + 16, b + book.header(bool(self.tx['title'])), b + 5 + 16, b + 5 + 24)   # 底下给页角花饰留位置
             self.btn.setText(self.tx.get('seal', self.tx['send']))   # 圆形火漆印；没写字就压一个十字（大小在 apply_size 里定）
         lay.addLayout(top)
         lay.addWidget(self.perm)
@@ -347,8 +347,8 @@ class ChatWindow(QWidget):
         items = [(e['role'], e['text'], e.get('src'), False) for e in log] + [('user', m['text'], None, True) for m in pending]
         for i, (role, text, src, pend) in enumerate(items):
             if self.book and role == 'user' and i > 0:   # 每段问答之间一个小花饰
-                sep = QLabel('·  ✠  ·')
-                sep.setObjectName('sep')
+                sep = QLabel()
+                sep.setPixmap(book.divider(round(150 * self.k), self.t['colors']['gold'], self.t['colors']['rubric']))
                 sep.setAlignment(Qt.AlignCenter)
                 self.list.addWidget(sep)
             self.add_msg(role, text, src=src, pending=pend)
