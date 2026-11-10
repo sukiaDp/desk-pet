@@ -4,7 +4,7 @@
 
 - 首次准备：`./setup.sh`（在 `/mnt/data2/desk-pet-build/venv` 建 Python 3.12 venv 装 PySide6；3.10 上 PySide6 会崩）
 - 启动：`./desk-pet.sh`；退出：托盘图标 →「退出」（也可以在那里显示 / 隐藏）
-- 设置：托盘「设置」里可以镜像（左右翻转，跑动和视线方向跟着换）、改大小（1–3 倍，会自动重启）；存在 `~/.config/desk-pet/settings.json`。临时放大也可以 `DESK_PET_SCALE=2 ./desk-pet.sh`。
+- 设置：托盘「设置」里可以镜像（左右翻转，跑动和视线方向跟着换）、改大小（1–3 倍，会自动重启）、聊天窗大小（小 / 中 / 大，窗口和字号一起缩放，马上生效）；存在 `~/.config/desk-pet/settings.json`。临时放大也可以 `DESK_PET_SCALE=2 ./desk-pet.sh`。
 - 输入法：pip 装的 PySide6 没有 fcitx 插件，用 fcitx5 时自动改走它的 ibus 兼容接口。
 - 形象：每个形象一个目录 `themes/<id>/`，里面是 `theme.json`（名字、配色、字体、头像位置、界面文字、聊天窗外观 `look`：`book` 是厚皮书页，不写就是普通聊天窗）和素材 `assets/`。托盘「形象」菜单切换；也可以 `DESK_PET_THEME=<id>`。加新形象就是复制一个目录改掉，没写的字段用 `theme.py` 里的默认值。
 - 羊角修女（`themes/sheep-nun`）：`assets/` 是 1–6 号完整状态包解压后的原样内容；提裙礼、被夸后藏脸、无聊等待三个附加包整理成 `assets/states/<id>/` 并列在 `assets/extra-states.json`。原始 zip 在 `source-zips/`（不进 git）。

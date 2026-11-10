@@ -29,12 +29,12 @@ def _im_module():
 _im_module()
 
 from PySide6.QtCore import QPoint, QRect, Qt, QTimer
-from PySide6.QtGui import (QAction, QBitmap, QColor, QCursor, QFont, QGuiApplication, QIcon, QImage,
+from PySide6.QtGui import (QAction, QActionGroup, QBitmap, QColor, QCursor, QFont, QGuiApplication, QIcon, QImage,
                            QPainter, QPixmap, QRegion, QTransform)
 from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon, QWidget
 
 import theme
-from chat import ChatWindow
+from chat import SIZE_LABEL, ChatWindow
 
 ROOT = Path(__file__).resolve().parent
 THEME = theme.load()                                         # 形象：themes/<id>/（见 theme.py）
@@ -177,7 +177,7 @@ class Pet(QWidget):
         # 鼠标
         self.press = None
         self.mirror = bool(CFG.get('mirror'))     # 设置：左右镜像
-        self.chat = ChatWindow(THEME, self.neutral)
+        self.chat = ChatWindow(THEME, self.neutral, CFG.get('chat_size', 'small'))
         self.chat.pet = self
 
         g = QGuiApplication.primaryScreen().availableGeometry()
@@ -429,6 +429,13 @@ def main():
         a = QAction(f'{n} 倍', size, checkable=True, checked=n == K)
         a.triggered.connect(lambda _=False, n=n: (save_settings(scale=n), restart()))
         size.addAction(a)
+    chat_size = settings.addMenu('聊天窗大小')      # 马上生效，不用重启
+    group = QActionGroup(chat_size)
+    for key, name in SIZE_LABEL.items():
+        a = QAction(name, chat_size, checkable=True, checked=key == CFG.get('chat_size', 'small'))
+        a.triggered.connect(lambda _=False, key=key: (save_settings(chat_size=key), pet.chat.apply_size(key)))
+        group.addAction(a)
+        chat_size.addAction(a)
     looks = menu.addMenu('形象')                  # 换形象：记下选择，重启自己
     for tid, name in theme.available():
         a = QAction(name, looks, checkable=True, checked=tid == THEME['id'])

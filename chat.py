@@ -7,17 +7,21 @@
 """
 import json
 import os
+import re
 import time
 from pathlib import Path
 
 from PySide6.QtCore import QRectF, QSize, Qt, QTimer
-from PySide6.QtGui import QColor, QFont, QIcon, QGuiApplication, QPainter, QPainterPath, QPixmap
+from PySide6.QtGui import QColor, QFont, QFontMetrics, QIcon, QGuiApplication, QPainter, QPainterPath, QPixmap
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel, QLineEdit, QPushButton,
                                QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
 import book
 
 CHAT = Path.home() / '.cache/desk-pet/chat'
+# 聊天窗大小：(宽, 高, 字号倍数)；托盘「设置 → 聊天窗大小」切换
+SIZES = {'small': (440, 700, 1.0), 'medium': (560, 880, 1.25), 'large': (680, 1060, 1.5)}
+SIZE_LABEL = {'small': '小', 'medium': '中', 'large': '大'}
 STATE_LABEL = {'working': '工作中', 'reading': '查看中', 'waiting': '等你回复', 'done': '完成啦', 'error': '出错了', 'idle': '空闲'}
 
 def rgba(hex_, a):
@@ -67,10 +71,15 @@ QPushButton#close:hover {{ color: {c['rubric']}; }}
 """
 
 
-def style(t):
-    """按主题配色生成样式表；每个控件都写明颜色，不吃系统深色主题。"""
-    if t.get('look') == 'book':
-        return book_style(t)
+def style(t, k=1.0):
+    """按主题配色生成样式表，再按大小倍数 k 缩放所有字号。"""
+    css = book_style(t) if t.get('look') == 'book' else plain_style(t)
+    css = re.sub(r'font-size: (\d+)px', lambda m: f'font-size: {round(int(m.group(1)) * k)}px', css)
+    return f'QWidget#chat * {{ font-size: {round(13 * k)}px; }}\n' + css   # 没写字号的控件用这个，放最前面好被覆盖
+
+
+def plain_style(t):
+    """普通聊天窗；每个控件都写明颜色，不吃系统深色主题。"""
     c = t['colors']
     font = f"QWidget#chat, QWidget#chat * {{ font-family: '{t['font']}'; }}" if t['font'] else ''
     return font + f"""
@@ -147,25 +156,21 @@ def send(sid, item):
 
 
 class ChatWindow(QWidget):
-    def __init__(self, theme, neutral):
+    def __init__(self, theme, neutral, size='small'):
         self.book = theme.get('look') == 'book'
         flags = Qt.Window | Qt.WindowStaysOnTopHint | (Qt.FramelessWindowHint if self.book else Qt.Widget)
         super().__init__(None, flags)
         self.t, self.tx = theme, theme['text']
         self.setObjectName('chat')
         self.setWindowTitle(self.tx['title'] or theme['name'])
-        self.setStyleSheet(style(theme))
-        self.avatar = round_avatar(neutral, theme['avatar']) if theme.get('avatar') and not neutral.isNull() else None
+        self.neutral, self.k, self.avatar = neutral, 1.0, None
         if self.book:
             self.setAttribute(Qt.WA_TranslucentBackground)
-            if self.avatar:
-                self.avatar = book.ring_avatar(self.avatar, theme['colors']['gold'])
             self.cover, self.drag_from, self.subtitle = None, None, ''
             self.close_btn = QPushButton('✕', self)
             self.close_btn.setObjectName('close')
             self.close_btn.setCursor(Qt.PointingHandCursor)
             self.close_btn.clicked.connect(self.hide)
-        self.resize(440, 700) if self.book else self.resize(420, 680)
         self.sessions = []           # [(sid, cwd, state)]
         self.sid = None
         self.shown_key = None        # 上次画的内容，没变就不重画
@@ -214,15 +219,37 @@ class ChatWindow(QWidget):
         if self.book:                            # 内容放在纸页里，顶上留给标题
             b = book.BORDER
             lay.setContentsMargins(b + 16, b + book.header(bool(self.tx['title'])), b + 5 + 16, b + 5 + 12)
-            self.btn.setText(self.tx.get('seal', self.tx['send']))
-            self.btn.setFixedSize(38, 38)            # 圆形火漆印；没写字就压一个十字
-            if not self.btn.text():
-                self.btn.setIcon(QIcon(book.seal_icon(22, theme['colors']['accent_ink'])))
-                self.btn.setIconSize(QSize(22, 22))
+            self.btn.setText(self.tx.get('seal', self.tx['send']))   # 圆形火漆印；没写字就压一个十字（大小在 apply_size 里定）
         lay.addLayout(top)
         lay.addWidget(self.perm)
         lay.addWidget(self.scroll, 1)
         lay.addLayout(bottom)
+        self.apply_size(size)
+
+    def apply_size(self, name):
+        """小 / 中 / 大：窗口、字号、头像、火漆印一起缩放，马上生效。"""
+        w, h, k = SIZES.get(name, SIZES['small'])
+        if not self.book:
+            w, h = w - 20, h - 20
+        self.k = k
+        self.setStyleSheet(style(self.t, k))
+        a = None
+        if self.t.get('avatar') and not self.neutral.isNull():
+            a = round_avatar(self.neutral, self.t['avatar'], round(34 * k))
+            if self.book:
+                a = book.ring_avatar(a, self.t['colors']['gold'])
+        self.avatar = a
+        if self.book:
+            n = round(38 * k)
+            self.btn.setFixedSize(n, n)
+            self.btn.setStyleSheet(f'border-radius: {n // 2}px;')
+            if not self.btn.text():
+                self.btn.setIcon(QIcon(book.seal_icon(round(22 * k), self.t['colors']['accent_ink'])))
+                self.btn.setIconSize(QSize(round(22 * k), round(22 * k)))
+        self.resize(w, h)
+        self.shown_key = None                    # 头像、气泡宽度都变了：重画对话
+        self.refresh()
+        self.update()
 
     # ---- 桌宠每秒调一次 ----
     def update_sessions(self, sessions):
@@ -344,7 +371,19 @@ class ChatWindow(QWidget):
         b.setWordWrap(True)
         b.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.LinksAccessibleByMouse)
         b.setOpenExternalLinks(True)
-        b.setMaximumWidth(int(self.width() * (0.86 if self.book else 0.8)))
+        # 能用的宽度：窗口减去书页边距 / 窗口边距、滚动条，她的话再减去头像
+        avail = self.width() - ((book.BORDER * 2 + 5 + 32) if self.book else 22) - 22
+        if role == 'cc' and self.avatar:
+            avail -= self.avatar.width() + 8
+        maxw = int(avail * (0.96 if role == 'cc' else 0.85))
+        b.setMaximumWidth(maxw)
+        # 自动换行的标签会估得太窄：按最长一行的实际宽度给最小宽度（这时样式表还没套上，按样式里的字号自己量）
+        f = QFont(self.t['font'] or b.font().family())
+        f.setPixelSize(round((14 if self.book else 13) * self.k))
+        f.setItalic(self.book and role == 'user')
+        fm = QFontMetrics(f)
+        longest = max((fm.horizontalAdvance(line) for line in b.text().splitlines() or ['']), default=0)
+        b.setMinimumWidth(min(longest + 24, maxw))
         if self.book and role == 'user':
             b.setAlignment(Qt.AlignRight)
         b.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
@@ -480,7 +519,7 @@ class ChatWindow(QWidget):
         p.setRenderHint(QPainter.TextAntialiasing)
         pr = book.page_rect(self.width(), self.height())
         f = QFont(self.t['font'] or self.font().family())
-        f.setPixelSize(20)
+        f.setPixelSize(round(20 * self.k))
         f.setBold(True)
         f.setLetterSpacing(QFont.AbsoluteSpacing, 6)
         p.setFont(f)
@@ -489,7 +528,7 @@ class ChatWindow(QWidget):
         if self.tx['title']:
             p.drawText(QRectF(pr.left(), pr.top() + 8, pr.width(), 30), Qt.AlignCenter, self.tx['title'])
         if self.subtitle:
-            f.setPixelSize(11)
+            f.setPixelSize(round(11 * self.k))
             f.setBold(False)
             f.setItalic(True)
             f.setLetterSpacing(QFont.AbsoluteSpacing, 1)
