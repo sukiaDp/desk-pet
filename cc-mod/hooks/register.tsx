@@ -140,6 +140,17 @@ async function askPet($: any, a: Ask): Promise<any> {
   }
 }
 
+// CC 转圈提示的英文词（Brewing、Pondering……）翻成西幻风：思考时页尾显示「正在熬制魔药…」
+const SPINNER_WORDS: Record<string, string> = { "accomplishing": "完成仪式", "actioning": "施展法术", "actualizing": "将幻象化为现实", "baking": "烘焙精灵面包", "beaming": "沐浴圣光", "befuddling": "施放迷惑术", "bloviating": "在酒馆高谈阔论", "boogieing": "与林中精灵共舞", "boondoggling": "替国王跑腿", "booping": "轻点魔法水晶", "brewing": "熬制魔药", "burrowing": "钻进矮人地道", "calculating": "推演星盘", "canoodling": "和魔宠依偎", "caramelizing": "熬制龙息焦糖", "cascading": "引落星辰瀑布", "catapulting": "架起投石机", "cerebrating": "唤醒心灵之眼", "channeling": "引导魔力", "channelling": "引导魔力", "choreographing": "编排宫廷舞步", "churning": "搅动炼金釜", "clambering": "攀登高塔", "clauding": "聆听神谕", "coalescing": "凝聚以太", "cogitating": "冥思古老奥秘", "combobulating": "拼合散落的符文", "composing": "谱写圣歌", "computing": "拨动命运齿轮", "concocting": "调配秘药", "considering": "斟酌预言", "contemplating": "静观星辰", "cooking": "熬煮秘药", "crafting": "锻造附魔器物", "creating": "创生奇物", "crunching": "碾磨龙骨", "crystallizing": "凝结魔晶", "cultivating": "培育灵草", "deciphering": "破译古卷", "deliberating": "召开贤者议会", "determining": "求问命运", "dilly-dallying": "在城堡回廊磨蹭", "discombobulating": "扰乱时空", "divining": "占卜", "doing": "践行誓约", "doodling": "在羊皮纸上画符文", "drizzling": "洒下圣露", "ebbing": "随月潮退去", "effecting": "施放咒效", "elucidating": "驱散迷雾", "embellishing": "镶嵌宝石", "enchanting": "附魔", "envisioning": "窥视预视", "evaporating": "化作薄雾", "fermenting": "酿造蜂蜜酒", "fiddle-faddling": "和吟游诗人闲扯", "finagling": "与地精讨价还价", "flambéing": "点燃龙焰", "flibbertigibbeting": "和小精灵叽叽喳喳", "flowing": "随魔力流转", "flummoxing": "对着谜题发愣", "fluttering": "振翅飞舞", "forging": "在矮人熔炉锻造", "forming": "塑形", "frolicking": "与独角兽嬉戏", "frosting": "凝霜", "gallivanting": "浪迹诸国", "galloping": "策马疾驰", "garnishing": "点缀圣餐", "generating": "唤生", "germinating": "培育曼德拉草", "gesticulating": "比划施法手势", "gitifying": "封存卷轴", "grooving": "随鼓点律动", "gusting": "呼唤疾风", "harmonizing": "和鸣圣歌", "hashing": "刻写密纹", "hatching": "孵化龙蛋", "herding": "牧放狮鹫", "honking": "吹响号角", "hullaballooing": "举办宴会", "hustling": "疾行于王城", "hyperspacing": "穿越传送门", "ideating": "酝酿灵感", "imagining": "编织幻梦", "improvising": "即兴吟唱", "incubating": "温养龙蛋", "inferring": "解读征兆", "infusing": "注入魔力", "ionizing": "引来天雷", "jitterbugging": "跳起精灵舞步", "jiving": "与林中精灵共舞", "julienning": "切制药草丝", "kneading": "揉制圣饼", "leavening": "发酵魔法面团", "levitating": "漂浮半空", "lollygagging": "在酒馆闲坐", "manifesting": "显化", "marinating": "浸泡圣水", "meandering": "漫游迷雾森林", "metamorphosing": "施展变形", "misting": "招来晨雾", "moonwalking": "月下漫步", "moseying": "踱步回廊", "mulling": "温煮香料酒", "mustering": "召集骑士团", "musing": "吟游沉思", "nebulizing": "化身星云", "nesting": "在塔顶筑巢", "noodling": "拨弄竖琴", "nucleating": "凝结星核", "orbiting": "绕星辰运行", "orchestrating": "指挥精灵合唱", "osmosing": "吸纳灵气", "perambulating": "巡游领地", "percolating": "萃取月露", "perusing": "翻阅魔典", "philosophising": "与贤者论道", "philosophizing": "与贤者论道", "photosynthesizing": "吸收日光", "pollinating": "为灵花授粉", "pondering": "冥想", "pontificating": "宣讲圣典", "pouncing": "猛扑猎物", "precipitating": "降下神谕之雨", "prestidigitating": "变戏法", "processing": "运转魔法阵", "proofing": "醒发面团", "propagating": "传播福音", "puttering": "整理药草", "puzzling": "解开谜题", "quantumizing": "窥探虚空", "razzle-dazzling": "施放幻光", "razzmatazzing": "施放幻光", "recombobulating": "重组符文", "reticulating": "编织星网", "roosting": "栖于塔顶", "ruminating": "反刍古老智慧", "sautéing": "炙烤魔兽肉", "sauteing": "炙烤魔兽肉", "scampering": "小步疾奔", "schlepping": "搬运宝箱", "scheming": "密谋", "scurrying": "穿过地窖", "seasoning": "调味", "shenaniganing": "恶作剧", "shimmying": "穿越暗门", "shucking": "剥开秘银贝", "simmering": "文火炖煮魔药", "skedaddling": "溜之大吉", "sketching": "描绘星图", "slithering": "如蛇潜行", "smooshing": "揉捏魔法黏土", "sock-hopping": "参加宫廷舞会", "spelunking": "探索地下城", "spinning": "纺织命运之线", "sprouting": "萌发新芽", "stewing": "炖煮秘药", "stirring": "搅拌魔药", "sublimating": "升华", "sussing": "识破幻术", "swirling": "卷起魔力风暴", "swooping": "乘鹰俯冲", "symbioting": "与树灵共生", "synthesizing": "炼成", "tempering": "淬火", "thaumaturging": "行神迹", "thinking": "思索", "thundering": "召唤雷霆", "tinkering": "摆弄机关", "tomfoolering": "扮演宫廷小丑", "topsy-turvying": "颠倒乾坤", "transfiguring": "施展变形术", "transmuting": "点金", "twisting": "扭转命运", "undulating": "随潮涌动", "unfurling": "展开古老卷轴", "unravelling": "拆解封印", "unraveling": "拆解封印", "vibing": "感应魔力共鸣", "waddling": "摇摇摆摆前行", "wandering": "游历诸国", "warping": "扭曲时空", "whatchamacalliting": "寻找无名之物", "whirlpooling": "卷起漩涡", "whirring": "驱动魔像", "whisking": "搅打魔法奶油", "wibbling": "摇晃药剂瓶", "wizarding": "施展巫术", "working": "劳作", "wrangling": "驯服龙驹", "zesting": "刨取月橘皮", "zigzagging": "穿行迷宫" }
+const SPINNER_FALLBACK = ['吟诵咒文', '凝视水晶球', '点燃蜡烛祈祷', '翻阅魔典', '聆听星辰低语', '描绘魔法阵']
+function fantasy(word: string): string {
+  const w = String(word ?? '').trim().replace(/[.…]+$/, '').toLowerCase()
+  if (SPINNER_WORDS[w]) return SPINNER_WORDS[w]
+  let h = 0
+  for (const ch of w) h = (h * 31 + ch.charCodeAt(0)) | 0
+  return SPINNER_FALLBACK[Math.abs(h) % SPINNER_FALLBACK.length]
+}
+
 // 工具调用说成人话：读 chat.py、跑命令：npm test、搜索「foo」……
 function describe(e: any): string {
   const base = (f: any) => String(f ?? '').split('/').filter(Boolean).pop() ?? ''
@@ -207,6 +218,15 @@ export const register: Register = on => {
     )
   })
 
+  // 思考时（没在用工具）：读转圈提示当前的词，翻成西幻风给桌宠窗口；提示本身原样画
+  on('ui.render', { component: 'Spinner' }, async ($, e, next) => {
+    const pr: any = e.props
+    if (pr.mode !== 'tool-use' && pr.mode !== 'tool-input' && pr.word && (await read($, enabledAtom))) {
+      await setActivity($, fantasy(pr.word))
+    }
+    return next(e)
+  })
+
   on('session.end', async ($, e, next) => {
     await write($, 'ended')
     dir = ''
@@ -231,7 +251,7 @@ export const register: Register = on => {
       if (i >= 0) petTexts.splice(i, 1)
       if (PRAISE.test(e.text)) praised = await $.clock.now()
       await write($, 'working')
-      await setActivity($, '在想')
+      await setActivity($, '冥想')
     }
     return next(e)
   })
