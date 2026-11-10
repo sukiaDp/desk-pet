@@ -2,7 +2,7 @@
 """羊角修女桌宠（PySide6）。
 
 透明无边框置顶窗口；按 Claude Code 的状态播动画（状态由 cc-mod 写到 ~/.cache/desk-pet/sessions）；
-点她一下行提裙礼，之后视线跟着鼠标一会儿；按住拖动时按方向跑；托盘可退出。
+点她一下行提裙礼，之后视线跟着鼠标一会儿；双击打开聊天小窗（chat.py）；按住拖动时按方向跑；托盘可退出。
 透明处点穿用 setMask：窗口形状 = 当前画面的不透明像素。
 """
 import json
@@ -21,9 +21,12 @@ from PySide6.QtGui import (QAction, QBitmap, QColor, QCursor, QFont, QGuiApplica
                            QPainter, QPixmap, QRegion, QTransform)
 from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon, QWidget
 
+from chat import ChatWindow
+
 ROOT = Path(__file__).resolve().parent
 ASSETS = Path(os.environ.get('DESK_PET_ASSETS') or ROOT / 'assets')
 SESSIONS = Path.home() / '.cache/desk-pet/sessions'
+ALIVE = Path.home() / '.cache/desk-pet/pet.json'      # 桌宠心跳：mod 据此决定提问发不发到聊天窗
 K = max(1, int(os.environ.get('DESK_PET_SCALE') or 1))     # 整数放大倍数
 DEBUG = bool(os.environ.get('DESK_PET_DEBUG'))
 
@@ -78,7 +81,7 @@ def load_clip(meta):
 def cc_state():
     """汇总所有 CC 会话：等你回复 > 出错 > 工作中 > 查看中 > 完成 > 空闲。
     3 分钟没心跳的不算；ended 和 1 天前的文件顺手删掉；完成/出错超过 2 分钟算空闲。"""
-    counts, praised, now = {}, 0, time.time()
+    counts, praised, now, live = {}, 0, time.time(), []
     for p in SESSIONS.glob('*.json'):
         try:
             age = now - p.stat().st_mtime
@@ -92,10 +95,12 @@ def cc_state():
         if age > 180:
             continue
         praised = max(praised, v.get('praised') or 0)
+        live.append((p.stem, v.get('cwd', ''), st, p.stat().st_mtime))
         if st in ('done', 'error') and age > 120:
             st = 'idle'
         counts[st] = counts.get(st, 0) + 1
-    return next((s for s in PRIORITY if s in counts), 'idle'), counts, praised
+    live = [x[:3] for x in sorted(live, key=lambda x: -x[3])]       # 最近有动静的会话排前面
+    return next((s for s in PRIORITY if s in counts), 'idle'), counts, praised, live
 
 
 class Pet(QWidget):
@@ -133,6 +138,8 @@ class Pet(QWidget):
         self.frame = self.neutral
         # 鼠标
         self.press = None
+        self.chat = ChatWindow()
+        self.chat.pet = self
 
         g = QGuiApplication.primaryScreen().availableGeometry()
         self.move(g.right() - 60 - self.width(), g.bottom() - 40 - self.height())
@@ -306,14 +313,25 @@ class Pet(QWidget):
             self.gaze_until = now + CLICK_CURTSY_MS + CLICK_GAZE_MS
             self.idle_since, self.long_idle = now, None   # 点醒她，重新计闲置
             self.bubble_off = True
+            if self.chat.unread:                     # 有新回复：点一下直接打开聊天窗
+                self.chat.open_near(self)
             self.render()
             log('点击')
         self.press = None
 
+    def mouseDoubleClickEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            self.chat.open_near(self)
+
     # ---- CC 状态 ----
     def poll(self):
-        state, counts, praised = cc_state()
+        state, counts, praised, live = cc_state()
         now = now_ms()
+        try:
+            ALIVE.write_text(json.dumps({'ts': int(time.time() * 1000)}))
+        except OSError:
+            pass
+        self.chat.update_sessions(live)
         if state != self.cc:
             log(f'cc {self.cc} -> {state}')
             if INTRO.get(state) in self.clips:
@@ -334,6 +352,8 @@ class Pet(QWidget):
         n = counts.get(state, 0)
         others = ''.join(f' +{v} {LABEL.get(k, k)}' for k, v in counts.items() if k not in (state, 'idle') and v > 0)
         text = LABEL[state] + (f' ×{n}' if n > 1 else '') + others if LABEL[state] else ''
+        if self.chat.unread:
+            text = '有新回复，点我看'
         if text != self.bubble:
             self.bubble, self.bubble_off = text, False
             self.render()
@@ -349,6 +369,9 @@ def main():
     tray = QSystemTrayIcon(QIcon(QPixmap.fromImage(pet.neutral)), app)
     tray.setToolTip('羊角修女')
     menu = QMenu()
+    chat = QAction('聊天', menu)
+    chat.triggered.connect(lambda: pet.chat.open_near(pet))
+    menu.addAction(chat)
     toggle = QAction('显示 / 隐藏', menu)
     toggle.triggered.connect(lambda: pet.setVisible(not pet.isVisible()))
     quit_ = QAction('退出', menu)
