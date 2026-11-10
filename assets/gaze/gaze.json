@@ -1,0 +1,905 @@
+{
+  "id": "gaze",
+  "name": "16方向注视",
+  "mode": "parameterized_hold",
+  "coordinate_system": "viewer; 0 up, 90 right, 180 down, 270 left",
+  "midpoint_reuse": "The mild head/eye movement is physically reversible; entry midpoint is reused for exit.",
+  "variants": [
+    {
+      "angle_degrees": 0.0,
+      "id": "000_0",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/000_0/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "ba4be3ac8f907e1306700fab2409e27d66fcf3b85499940e9a378ba5690d1775"
+        },
+        "sustain": {
+          "path": "gaze/000_0/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "ba4be3ac8f907e1306700fab2409e27d66fcf3b85499940e9a378ba5690d1775",
+          "last_sha256": "ba4be3ac8f907e1306700fab2409e27d66fcf3b85499940e9a378ba5690d1775"
+        },
+        "exit": {
+          "path": "gaze/000_0/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "ba4be3ac8f907e1306700fab2409e27d66fcf3b85499940e9a378ba5690d1775",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/000_0/demo-transparent.gif",
+      "transparent_demo": "gaze/000_0/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 22.5,
+      "id": "022_5",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/022_5/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "1d1378516e9999670dd08d97a3d9c2d676bf890d11b6a6f2ed22d1676a63565f"
+        },
+        "sustain": {
+          "path": "gaze/022_5/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "1d1378516e9999670dd08d97a3d9c2d676bf890d11b6a6f2ed22d1676a63565f",
+          "last_sha256": "1d1378516e9999670dd08d97a3d9c2d676bf890d11b6a6f2ed22d1676a63565f"
+        },
+        "exit": {
+          "path": "gaze/022_5/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "1d1378516e9999670dd08d97a3d9c2d676bf890d11b6a6f2ed22d1676a63565f",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/022_5/demo-transparent.gif",
+      "transparent_demo": "gaze/022_5/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 45.0,
+      "id": "045_0",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/045_0/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "5fab1302a02725f7f077734255553f83a81fcfec680837597108ba4a1d278bcf"
+        },
+        "sustain": {
+          "path": "gaze/045_0/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "5fab1302a02725f7f077734255553f83a81fcfec680837597108ba4a1d278bcf",
+          "last_sha256": "5fab1302a02725f7f077734255553f83a81fcfec680837597108ba4a1d278bcf"
+        },
+        "exit": {
+          "path": "gaze/045_0/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "5fab1302a02725f7f077734255553f83a81fcfec680837597108ba4a1d278bcf",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/045_0/demo-transparent.gif",
+      "transparent_demo": "gaze/045_0/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 67.5,
+      "id": "067_5",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/067_5/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "58c789580019d4abfef3b7639a19f4aa7d41a434c3b24c7114c33085785d487a"
+        },
+        "sustain": {
+          "path": "gaze/067_5/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "58c789580019d4abfef3b7639a19f4aa7d41a434c3b24c7114c33085785d487a",
+          "last_sha256": "58c789580019d4abfef3b7639a19f4aa7d41a434c3b24c7114c33085785d487a"
+        },
+        "exit": {
+          "path": "gaze/067_5/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "58c789580019d4abfef3b7639a19f4aa7d41a434c3b24c7114c33085785d487a",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/067_5/demo-transparent.gif",
+      "transparent_demo": "gaze/067_5/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 90.0,
+      "id": "090_0",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/090_0/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "bb648661506d3fb71937d0095a747ecc8a6724e23112f43fbec77d1e77a1ec2e"
+        },
+        "sustain": {
+          "path": "gaze/090_0/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "bb648661506d3fb71937d0095a747ecc8a6724e23112f43fbec77d1e77a1ec2e",
+          "last_sha256": "bb648661506d3fb71937d0095a747ecc8a6724e23112f43fbec77d1e77a1ec2e"
+        },
+        "exit": {
+          "path": "gaze/090_0/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "bb648661506d3fb71937d0095a747ecc8a6724e23112f43fbec77d1e77a1ec2e",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/090_0/demo-transparent.gif",
+      "transparent_demo": "gaze/090_0/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 112.5,
+      "id": "112_5",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/112_5/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "d4d1d37bf8f6dce89d0df70c873359ba71b2d5033f3842a480372f7dd51f7111"
+        },
+        "sustain": {
+          "path": "gaze/112_5/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "d4d1d37bf8f6dce89d0df70c873359ba71b2d5033f3842a480372f7dd51f7111",
+          "last_sha256": "d4d1d37bf8f6dce89d0df70c873359ba71b2d5033f3842a480372f7dd51f7111"
+        },
+        "exit": {
+          "path": "gaze/112_5/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "d4d1d37bf8f6dce89d0df70c873359ba71b2d5033f3842a480372f7dd51f7111",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/112_5/demo-transparent.gif",
+      "transparent_demo": "gaze/112_5/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 135.0,
+      "id": "135_0",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/135_0/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "5e49556d3ab9bad711ad502b8db8a333b1a2a75ae64663cc6e527ff157b66e86"
+        },
+        "sustain": {
+          "path": "gaze/135_0/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "5e49556d3ab9bad711ad502b8db8a333b1a2a75ae64663cc6e527ff157b66e86",
+          "last_sha256": "5e49556d3ab9bad711ad502b8db8a333b1a2a75ae64663cc6e527ff157b66e86"
+        },
+        "exit": {
+          "path": "gaze/135_0/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "5e49556d3ab9bad711ad502b8db8a333b1a2a75ae64663cc6e527ff157b66e86",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/135_0/demo-transparent.gif",
+      "transparent_demo": "gaze/135_0/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 157.5,
+      "id": "157_5",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/157_5/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "634a97cf0e715fbd559f1fc193096791ab242d0f69cc3a2b8c27163bd1346d42"
+        },
+        "sustain": {
+          "path": "gaze/157_5/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "634a97cf0e715fbd559f1fc193096791ab242d0f69cc3a2b8c27163bd1346d42",
+          "last_sha256": "634a97cf0e715fbd559f1fc193096791ab242d0f69cc3a2b8c27163bd1346d42"
+        },
+        "exit": {
+          "path": "gaze/157_5/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "634a97cf0e715fbd559f1fc193096791ab242d0f69cc3a2b8c27163bd1346d42",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/157_5/demo-transparent.gif",
+      "transparent_demo": "gaze/157_5/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 180.0,
+      "id": "180_0",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/180_0/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "5f68777ca1dd3c37cda3a558232de649494fa2317935ccc0a445a6d0c9730637"
+        },
+        "sustain": {
+          "path": "gaze/180_0/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "5f68777ca1dd3c37cda3a558232de649494fa2317935ccc0a445a6d0c9730637",
+          "last_sha256": "5f68777ca1dd3c37cda3a558232de649494fa2317935ccc0a445a6d0c9730637"
+        },
+        "exit": {
+          "path": "gaze/180_0/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "5f68777ca1dd3c37cda3a558232de649494fa2317935ccc0a445a6d0c9730637",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/180_0/demo-transparent.gif",
+      "transparent_demo": "gaze/180_0/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 202.5,
+      "id": "202_5",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/202_5/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "ec5cb1667b479a6dfbae029fc154502579977f12bbe866840a031fb22fc433fd"
+        },
+        "sustain": {
+          "path": "gaze/202_5/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "ec5cb1667b479a6dfbae029fc154502579977f12bbe866840a031fb22fc433fd",
+          "last_sha256": "ec5cb1667b479a6dfbae029fc154502579977f12bbe866840a031fb22fc433fd"
+        },
+        "exit": {
+          "path": "gaze/202_5/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "ec5cb1667b479a6dfbae029fc154502579977f12bbe866840a031fb22fc433fd",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/202_5/demo-transparent.gif",
+      "transparent_demo": "gaze/202_5/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 225.0,
+      "id": "225_0",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/225_0/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "d6f57034a41da807f5560f50ec94193172708587c6c009aa5107b24be854aed1"
+        },
+        "sustain": {
+          "path": "gaze/225_0/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "d6f57034a41da807f5560f50ec94193172708587c6c009aa5107b24be854aed1",
+          "last_sha256": "d6f57034a41da807f5560f50ec94193172708587c6c009aa5107b24be854aed1"
+        },
+        "exit": {
+          "path": "gaze/225_0/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "d6f57034a41da807f5560f50ec94193172708587c6c009aa5107b24be854aed1",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/225_0/demo-transparent.gif",
+      "transparent_demo": "gaze/225_0/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 247.5,
+      "id": "247_5",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/247_5/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "092c274d843e2925fe1c91d66a17e42fbde653e96df37ce4cf00244e08ac2e81"
+        },
+        "sustain": {
+          "path": "gaze/247_5/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "092c274d843e2925fe1c91d66a17e42fbde653e96df37ce4cf00244e08ac2e81",
+          "last_sha256": "092c274d843e2925fe1c91d66a17e42fbde653e96df37ce4cf00244e08ac2e81"
+        },
+        "exit": {
+          "path": "gaze/247_5/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "092c274d843e2925fe1c91d66a17e42fbde653e96df37ce4cf00244e08ac2e81",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/247_5/demo-transparent.gif",
+      "transparent_demo": "gaze/247_5/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 270.0,
+      "id": "270_0",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/270_0/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "0a8859001dfe7a71e100dd8e18d4c614977431577363cef33a54eea0e69f5e70"
+        },
+        "sustain": {
+          "path": "gaze/270_0/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "0a8859001dfe7a71e100dd8e18d4c614977431577363cef33a54eea0e69f5e70",
+          "last_sha256": "0a8859001dfe7a71e100dd8e18d4c614977431577363cef33a54eea0e69f5e70"
+        },
+        "exit": {
+          "path": "gaze/270_0/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "0a8859001dfe7a71e100dd8e18d4c614977431577363cef33a54eea0e69f5e70",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/270_0/demo-transparent.gif",
+      "transparent_demo": "gaze/270_0/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 292.5,
+      "id": "292_5",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/292_5/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "75348a1fa684f17c819e09feebf14e28ea0a536d95b7f7428228cb6528cac1b5"
+        },
+        "sustain": {
+          "path": "gaze/292_5/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "75348a1fa684f17c819e09feebf14e28ea0a536d95b7f7428228cb6528cac1b5",
+          "last_sha256": "75348a1fa684f17c819e09feebf14e28ea0a536d95b7f7428228cb6528cac1b5"
+        },
+        "exit": {
+          "path": "gaze/292_5/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "75348a1fa684f17c819e09feebf14e28ea0a536d95b7f7428228cb6528cac1b5",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/292_5/demo-transparent.gif",
+      "transparent_demo": "gaze/292_5/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 315.0,
+      "id": "315_0",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/315_0/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "ab6939b59a2a2696707f8afec2c5fd9db6f1875e4aa8d0d9e21412398f9a6dff"
+        },
+        "sustain": {
+          "path": "gaze/315_0/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "ab6939b59a2a2696707f8afec2c5fd9db6f1875e4aa8d0d9e21412398f9a6dff",
+          "last_sha256": "ab6939b59a2a2696707f8afec2c5fd9db6f1875e4aa8d0d9e21412398f9a6dff"
+        },
+        "exit": {
+          "path": "gaze/315_0/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "ab6939b59a2a2696707f8afec2c5fd9db6f1875e4aa8d0d9e21412398f9a6dff",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/315_0/demo-transparent.gif",
+      "transparent_demo": "gaze/315_0/demo-transparent.gif"
+    },
+    {
+      "angle_degrees": 337.5,
+      "id": "337_5",
+      "pivot": [
+        96,
+        202
+      ],
+      "mode": "hold",
+      "phases": {
+        "enter": {
+          "path": "gaze/337_5/enter",
+          "frame_count": 3,
+          "durations_ms": [
+            120,
+            140,
+            180
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "73e8c0c38437e248ac54117908887ff70b80bbdbd39f05f29a866dc7f7135c04"
+        },
+        "sustain": {
+          "path": "gaze/337_5/sustain",
+          "frame_count": 1,
+          "durations_ms": [
+            1000
+          ],
+          "duration_ms": 1000,
+          "mode": "hold",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "73e8c0c38437e248ac54117908887ff70b80bbdbd39f05f29a866dc7f7135c04",
+          "last_sha256": "73e8c0c38437e248ac54117908887ff70b80bbdbd39f05f29a866dc7f7135c04"
+        },
+        "exit": {
+          "path": "gaze/337_5/exit",
+          "frame_count": 3,
+          "durations_ms": [
+            180,
+            140,
+            120
+          ],
+          "duration_ms": 440,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "73e8c0c38437e248ac54117908887ff70b80bbdbd39f05f29a866dc7f7135c04",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "gaze/337_5/demo-transparent.gif",
+      "transparent_demo": "gaze/337_5/demo-transparent.gif"
+    }
+  ]
+}

@@ -1,0 +1,2148 @@
+{
+  "schema_version": "2.0",
+  "character": "羊角修女",
+  "default_state": "idle",
+  "neutral_frame": "neutral-N.png",
+  "cell_size": [
+    192,
+    208
+  ],
+  "pivot": [
+    96,
+    202
+  ],
+  "pixel_scaling": "nearest-neighbor",
+  "transition_policy": {
+    "between_states": "Finish exit to the exact common N, then enter the next state.",
+    "loop_exit": "Queue exit until the sustain anchor is reached.",
+    "one_shot_exit": "Complete forward one-shot sustain, then play the separate recovery exit.",
+    "duplicate_anchor_timing": "First and last loop anchor durations are split; their sum equals one anchor exposure."
+  },
+  "sustain_contract": "Enter N to settled S once; sustain stays in state for every frame; exit S to N once.",
+  "revision_changes": [
+    "waving",
+    "waiting",
+    "running",
+    "failed",
+    "review",
+    "sleepy-nod"
+  ],
+  "excluded_states": [
+    "book-jog"
+  ],
+  "state_count": 15,
+  "gaze_variant_count": 16,
+  "states": [
+    {
+      "id": "idle",
+      "name": "默认待机",
+      "mode": "loop",
+      "entry_anchor_source_frame": 0,
+      "exit_anchor_source_frame": 0,
+      "sustain_source_order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        0
+      ],
+      "sustain_source_kind": "existing_in_state_subset",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/idle/enter",
+          "frame_count": 1,
+          "durations_ms": [
+            100
+          ],
+          "duration_ms": 100,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        },
+        "sustain": {
+          "path": "states/idle/sustain",
+          "frame_count": 7,
+          "durations_ms": [
+            220,
+            280,
+            100,
+            100,
+            280,
+            350,
+            230
+          ],
+          "duration_ms": 1560,
+          "mode": "loop",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        },
+        "exit": {
+          "path": "states/idle/exit",
+          "frame_count": 1,
+          "durations_ms": [
+            100
+          ],
+          "duration_ms": 100,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/idle/demo-transparent.gif",
+      "transparent_demo": "states/idle/demo-transparent.gif",
+      "demo_duration_ms": 8090,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 4,
+      "repeat_policy": "repeat_sustain_only_until_exit_requested"
+    },
+    {
+      "id": "running-right",
+      "name": "向右跑",
+      "mode": "loop",
+      "entry_anchor_source_frame": 0,
+      "exit_anchor_source_frame": 0,
+      "sustain_source_order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        0
+      ],
+      "sustain_source_kind": "existing_in_state_subset",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/running-right/enter",
+          "frame_count": 5,
+          "durations_ms": [
+            120,
+            160,
+            160,
+            160,
+            140
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "9e43e0fe72442ab0085cf19f74ed0a3989ad1417f8a2cd4f1cd59482099f5c98"
+        },
+        "sustain": {
+          "path": "states/running-right/sustain",
+          "frame_count": 9,
+          "durations_ms": [
+            40,
+            90,
+            90,
+            90,
+            90,
+            90,
+            90,
+            90,
+            50
+          ],
+          "duration_ms": 720,
+          "mode": "loop",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "9e43e0fe72442ab0085cf19f74ed0a3989ad1417f8a2cd4f1cd59482099f5c98",
+          "last_sha256": "9e43e0fe72442ab0085cf19f74ed0a3989ad1417f8a2cd4f1cd59482099f5c98"
+        },
+        "exit": {
+          "path": "states/running-right/exit",
+          "frame_count": 5,
+          "durations_ms": [
+            140,
+            160,
+            160,
+            160,
+            120
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "9e43e0fe72442ab0085cf19f74ed0a3989ad1417f8a2cd4f1cd59482099f5c98",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/running-right/demo-transparent.gif",
+      "transparent_demo": "states/running-right/demo-transparent.gif",
+      "demo_duration_ms": 6130,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 4,
+      "repeat_policy": "repeat_sustain_only_until_exit_requested"
+    },
+    {
+      "id": "running-left",
+      "name": "向左跑",
+      "mode": "loop",
+      "entry_anchor_source_frame": 0,
+      "exit_anchor_source_frame": 0,
+      "sustain_source_order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        0
+      ],
+      "sustain_source_kind": "existing_in_state_subset",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/running-left/enter",
+          "frame_count": 5,
+          "durations_ms": [
+            120,
+            160,
+            160,
+            160,
+            140
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "fffec5d6b10a8526ceaf699205c65b38bf5688c2fdf33c0c4f48d1cda600738c"
+        },
+        "sustain": {
+          "path": "states/running-left/sustain",
+          "frame_count": 9,
+          "durations_ms": [
+            40,
+            90,
+            90,
+            90,
+            90,
+            90,
+            90,
+            90,
+            50
+          ],
+          "duration_ms": 720,
+          "mode": "loop",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "fffec5d6b10a8526ceaf699205c65b38bf5688c2fdf33c0c4f48d1cda600738c",
+          "last_sha256": "fffec5d6b10a8526ceaf699205c65b38bf5688c2fdf33c0c4f48d1cda600738c"
+        },
+        "exit": {
+          "path": "states/running-left/exit",
+          "frame_count": 5,
+          "durations_ms": [
+            140,
+            160,
+            160,
+            160,
+            120
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "fffec5d6b10a8526ceaf699205c65b38bf5688c2fdf33c0c4f48d1cda600738c",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/running-left/demo-transparent.gif",
+      "transparent_demo": "states/running-left/demo-transparent.gif",
+      "demo_duration_ms": 6130,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 4,
+      "repeat_policy": "repeat_sustain_only_until_exit_requested"
+    },
+    {
+      "id": "waving",
+      "name": "害羞招手",
+      "mode": "loop",
+      "entry_anchor_source_frame": 0,
+      "exit_anchor_source_frame": 0,
+      "sustain_source_order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        0
+      ],
+      "sustain_source_kind": "new_in_state_motion",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/waving/enter",
+          "frame_count": 5,
+          "durations_ms": [
+            120,
+            160,
+            160,
+            160,
+            140
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "57411476274e01f9fd6e4171acea9ffc9954c39d533d053f81babe5f0f2134eb"
+        },
+        "sustain": {
+          "path": "states/waving/sustain",
+          "frame_count": 7,
+          "durations_ms": [
+            110,
+            180,
+            160,
+            180,
+            180,
+            110,
+            110
+          ],
+          "duration_ms": 1030,
+          "mode": "loop",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "57411476274e01f9fd6e4171acea9ffc9954c39d533d053f81babe5f0f2134eb",
+          "last_sha256": "57411476274e01f9fd6e4171acea9ffc9954c39d533d053f81babe5f0f2134eb"
+        },
+        "exit": {
+          "path": "states/waving/exit",
+          "frame_count": 5,
+          "durations_ms": [
+            140,
+            160,
+            160,
+            160,
+            120
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "57411476274e01f9fd6e4171acea9ffc9954c39d533d053f81babe5f0f2134eb",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/waving/demo-transparent.gif",
+      "transparent_demo": "states/waving/demo-transparent.gif",
+      "demo_duration_ms": 7300,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 4,
+      "repeat_policy": "repeat_sustain_only_until_exit_requested"
+    },
+    {
+      "id": "jumping",
+      "name": "轻轻跳跃",
+      "mode": "oneshot",
+      "entry_anchor_source_frame": 0,
+      "exit_anchor_source_frame": 4,
+      "sustain_source_order": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "sustain_source_kind": "existing_in_state_subset",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/jumping/enter",
+          "frame_count": 5,
+          "durations_ms": [
+            100,
+            100,
+            100,
+            100,
+            100
+          ],
+          "duration_ms": 500,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "bcc6a62c3b458d5e39cbba1e62563058273dcaa27897c296679824bfd8686995"
+        },
+        "sustain": {
+          "path": "states/jumping/sustain",
+          "frame_count": 5,
+          "durations_ms": [
+            100,
+            110,
+            150,
+            110,
+            120
+          ],
+          "duration_ms": 590,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "bcc6a62c3b458d5e39cbba1e62563058273dcaa27897c296679824bfd8686995",
+          "last_sha256": "61df631b18c88664eb85f645e915fb1022cb6aa9562da72616d82e4bbcc2451c"
+        },
+        "exit": {
+          "path": "states/jumping/exit",
+          "frame_count": 5,
+          "durations_ms": [
+            100,
+            110,
+            110,
+            110,
+            120
+          ],
+          "duration_ms": 550,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "61df631b18c88664eb85f645e915fb1022cb6aa9562da72616d82e4bbcc2451c",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/jumping/demo-transparent.gif",
+      "transparent_demo": "states/jumping/demo-transparent.gif",
+      "demo_duration_ms": 3410,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 1,
+      "repeat_policy": "play_once_then_exit"
+    },
+    {
+      "id": "failed",
+      "name": "失落低头",
+      "mode": "loop",
+      "entry_anchor_source_frame": 3,
+      "exit_anchor_source_frame": 3,
+      "sustain_source_order": [
+        3,
+        4,
+        3,
+        2,
+        3
+      ],
+      "sustain_source_kind": "existing_in_state_subset",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/failed/enter",
+          "frame_count": 5,
+          "durations_ms": [
+            120,
+            160,
+            160,
+            160,
+            140
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "b843200ecc481073df911eb17db051ebb12cab6488df9991a24db05dab8f7f09"
+        },
+        "sustain": {
+          "path": "states/failed/sustain",
+          "frame_count": 5,
+          "durations_ms": [
+            250,
+            420,
+            320,
+            420,
+            250
+          ],
+          "duration_ms": 1660,
+          "mode": "loop",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "b843200ecc481073df911eb17db051ebb12cab6488df9991a24db05dab8f7f09",
+          "last_sha256": "b843200ecc481073df911eb17db051ebb12cab6488df9991a24db05dab8f7f09"
+        },
+        "exit": {
+          "path": "states/failed/exit",
+          "frame_count": 5,
+          "durations_ms": [
+            140,
+            160,
+            160,
+            160,
+            120
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "b843200ecc481073df911eb17db051ebb12cab6488df9991a24db05dab8f7f09",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/failed/demo-transparent.gif",
+      "transparent_demo": "states/failed/demo-transparent.gif",
+      "demo_duration_ms": 9680,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 4,
+      "repeat_policy": "repeat_sustain_only_until_exit_requested"
+    },
+    {
+      "id": "waiting",
+      "name": "等待回应",
+      "mode": "loop",
+      "entry_anchor_source_frame": 0,
+      "exit_anchor_source_frame": 0,
+      "sustain_source_order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        0
+      ],
+      "sustain_source_kind": "new_in_state_motion",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/waiting/enter",
+          "frame_count": 5,
+          "durations_ms": [
+            120,
+            160,
+            160,
+            160,
+            140
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "a8a2f95ca4b18e98ee79f6eaa34f57da94e5e14da22cb2616f0f22afca990733"
+        },
+        "sustain": {
+          "path": "states/waiting/sustain",
+          "frame_count": 7,
+          "durations_ms": [
+            190,
+            260,
+            100,
+            140,
+            240,
+            280,
+            190
+          ],
+          "duration_ms": 1400,
+          "mode": "loop",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a8a2f95ca4b18e98ee79f6eaa34f57da94e5e14da22cb2616f0f22afca990733",
+          "last_sha256": "a8a2f95ca4b18e98ee79f6eaa34f57da94e5e14da22cb2616f0f22afca990733"
+        },
+        "exit": {
+          "path": "states/waiting/exit",
+          "frame_count": 5,
+          "durations_ms": [
+            140,
+            160,
+            160,
+            160,
+            120
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a8a2f95ca4b18e98ee79f6eaa34f57da94e5e14da22cb2616f0f22afca990733",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/waiting/demo-transparent.gif",
+      "transparent_demo": "states/waiting/demo-transparent.gif",
+      "demo_duration_ms": 8700,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 4,
+      "repeat_policy": "repeat_sustain_only_until_exit_requested"
+    },
+    {
+      "id": "running",
+      "name": "专注工作",
+      "mode": "loop",
+      "entry_anchor_source_frame": 0,
+      "exit_anchor_source_frame": 0,
+      "sustain_source_order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        0
+      ],
+      "sustain_source_kind": "new_in_state_motion",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/running/enter",
+          "frame_count": 4,
+          "durations_ms": [
+            120,
+            160,
+            160,
+            140
+          ],
+          "duration_ms": 580,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "7b4832c7a4e6530a9742226ca04b5a9b3e972a23e8ec83c991b49c1b882e9d60"
+        },
+        "sustain": {
+          "path": "states/running/sustain",
+          "frame_count": 7,
+          "durations_ms": [
+            170,
+            260,
+            130,
+            120,
+            260,
+            300,
+            180
+          ],
+          "duration_ms": 1420,
+          "mode": "loop",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "7b4832c7a4e6530a9742226ca04b5a9b3e972a23e8ec83c991b49c1b882e9d60",
+          "last_sha256": "7b4832c7a4e6530a9742226ca04b5a9b3e972a23e8ec83c991b49c1b882e9d60"
+        },
+        "exit": {
+          "path": "states/running/exit",
+          "frame_count": 5,
+          "durations_ms": [
+            140,
+            160,
+            160,
+            160,
+            120
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "7b4832c7a4e6530a9742226ca04b5a9b3e972a23e8ec83c991b49c1b882e9d60",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/running/demo-transparent.gif",
+      "transparent_demo": "states/running/demo-transparent.gif",
+      "demo_duration_ms": 8640,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 4,
+      "repeat_policy": "repeat_sustain_only_until_exit_requested"
+    },
+    {
+      "id": "review",
+      "name": "低头检查",
+      "mode": "loop",
+      "entry_anchor_source_frame": 2,
+      "exit_anchor_source_frame": 2,
+      "sustain_source_order": [
+        2,
+        3,
+        2,
+        1,
+        2
+      ],
+      "sustain_source_kind": "existing_in_state_subset",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/review/enter",
+          "frame_count": 5,
+          "durations_ms": [
+            120,
+            160,
+            160,
+            160,
+            140
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "4496b3e790a11588eceb1b80e7e418cfea001a5bb447c8cf97cc37a7522e854f"
+        },
+        "sustain": {
+          "path": "states/review/sustain",
+          "frame_count": 5,
+          "durations_ms": [
+            220,
+            360,
+            300,
+            380,
+            230
+          ],
+          "duration_ms": 1490,
+          "mode": "loop",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "4496b3e790a11588eceb1b80e7e418cfea001a5bb447c8cf97cc37a7522e854f",
+          "last_sha256": "4496b3e790a11588eceb1b80e7e418cfea001a5bb447c8cf97cc37a7522e854f"
+        },
+        "exit": {
+          "path": "states/review/exit",
+          "frame_count": 5,
+          "durations_ms": [
+            140,
+            160,
+            160,
+            160,
+            120
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "4496b3e790a11588eceb1b80e7e418cfea001a5bb447c8cf97cc37a7522e854f",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/review/demo-transparent.gif",
+      "transparent_demo": "states/review/demo-transparent.gif",
+      "demo_duration_ms": 9030,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 4,
+      "repeat_policy": "repeat_sustain_only_until_exit_requested"
+    },
+    {
+      "id": "startled-avert",
+      "name": "被叫到吓一跳",
+      "mode": "oneshot",
+      "entry_anchor_source_frame": 1,
+      "exit_anchor_source_frame": 7,
+      "sustain_source_order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "sustain_source_kind": "existing_in_state_subset",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/startled-avert/enter",
+          "frame_count": 5,
+          "durations_ms": [
+            90,
+            80,
+            70,
+            70,
+            90
+          ],
+          "duration_ms": 400,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "e322b5442b0c6b4835d57d942068d8d95b0f7e190c8b394101f46348a2062b63"
+        },
+        "sustain": {
+          "path": "states/startled-avert/sustain",
+          "frame_count": 7,
+          "durations_ms": [
+            100,
+            150,
+            160,
+            180,
+            220,
+            230,
+            240
+          ],
+          "duration_ms": 1280,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "e322b5442b0c6b4835d57d942068d8d95b0f7e190c8b394101f46348a2062b63",
+          "last_sha256": "7995edf88ad295a9ed4fcba4cc7fd41cec3bcb4a74d5f61dcf5a4a25d81a7b96"
+        },
+        "exit": {
+          "path": "states/startled-avert/exit",
+          "frame_count": 5,
+          "durations_ms": [
+            140,
+            160,
+            160,
+            160,
+            120
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "7995edf88ad295a9ed4fcba4cc7fd41cec3bcb4a74d5f61dcf5a4a25d81a7b96",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/startled-avert/demo-transparent.gif",
+      "transparent_demo": "states/startled-avert/demo-transparent.gif",
+      "demo_duration_ms": 4160,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 1,
+      "repeat_policy": "play_once_then_exit"
+    },
+    {
+      "id": "prayer-peek",
+      "name": "祈祷时偷看",
+      "mode": "loop",
+      "entry_anchor_source_frame": 2,
+      "exit_anchor_source_frame": 2,
+      "sustain_source_order": [
+        2,
+        3,
+        4,
+        5,
+        4,
+        3,
+        2
+      ],
+      "sustain_source_kind": "existing_in_state_subset",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/prayer-peek/enter",
+          "frame_count": 5,
+          "durations_ms": [
+            120,
+            160,
+            160,
+            160,
+            140
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "74ff764b2b95539a69c21d45a4c9c07f9d47b79c5d1b1b6b46089549ede8cff8"
+        },
+        "sustain": {
+          "path": "states/prayer-peek/sustain",
+          "frame_count": 7,
+          "durations_ms": [
+            190,
+            350,
+            250,
+            650,
+            250,
+            350,
+            190
+          ],
+          "duration_ms": 2230,
+          "mode": "loop",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "74ff764b2b95539a69c21d45a4c9c07f9d47b79c5d1b1b6b46089549ede8cff8",
+          "last_sha256": "74ff764b2b95539a69c21d45a4c9c07f9d47b79c5d1b1b6b46089549ede8cff8"
+        },
+        "exit": {
+          "path": "states/prayer-peek/exit",
+          "frame_count": 5,
+          "durations_ms": [
+            140,
+            160,
+            160,
+            160,
+            120
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "74ff764b2b95539a69c21d45a4c9c07f9d47b79c5d1b1b6b46089549ede8cff8",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/prayer-peek/demo-transparent.gif",
+      "transparent_demo": "states/prayer-peek/demo-transparent.gif",
+      "demo_duration_ms": 12020,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 4,
+      "repeat_policy": "repeat_sustain_only_until_exit_requested"
+    },
+    {
+      "id": "sit-swing",
+      "name": "坐下晃脚",
+      "mode": "loop",
+      "entry_anchor_source_frame": 3,
+      "exit_anchor_source_frame": 3,
+      "sustain_source_order": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        2,
+        3
+      ],
+      "sustain_source_kind": "existing_in_state_subset",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/sit-swing/enter",
+          "frame_count": 5,
+          "durations_ms": [
+            120,
+            160,
+            160,
+            160,
+            140
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "e2006bb5346ab55a0df7149b4ebe45ee5877d4297540c1a05d17769e9710b732"
+        },
+        "sustain": {
+          "path": "states/sit-swing/sustain",
+          "frame_count": 9,
+          "durations_ms": [
+            120,
+            240,
+            240,
+            240,
+            240,
+            240,
+            260,
+            240,
+            120
+          ],
+          "duration_ms": 1940,
+          "mode": "loop",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "e2006bb5346ab55a0df7149b4ebe45ee5877d4297540c1a05d17769e9710b732",
+          "last_sha256": "e2006bb5346ab55a0df7149b4ebe45ee5877d4297540c1a05d17769e9710b732"
+        },
+        "exit": {
+          "path": "states/sit-swing/exit",
+          "frame_count": 6,
+          "durations_ms": [
+            140,
+            160,
+            160,
+            160,
+            160,
+            120
+          ],
+          "duration_ms": 900,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "e2006bb5346ab55a0df7149b4ebe45ee5877d4297540c1a05d17769e9710b732",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/sit-swing/demo-transparent.gif",
+      "transparent_demo": "states/sit-swing/demo-transparent.gif",
+      "demo_duration_ms": 11090,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 4,
+      "repeat_policy": "repeat_sustain_only_until_exit_requested"
+    },
+    {
+      "id": "sleepy-nod",
+      "name": "困得点头",
+      "mode": "loop",
+      "entry_anchor_source_frame": 4,
+      "exit_anchor_source_frame": 4,
+      "sustain_source_order": [
+        4,
+        3,
+        2,
+        3,
+        4
+      ],
+      "sustain_source_kind": "existing_in_state_subset",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/sleepy-nod/enter",
+          "frame_count": 5,
+          "durations_ms": [
+            120,
+            160,
+            160,
+            160,
+            140
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "c345ee5af97c9f8f749ab534acf790535a4ebf21008a74387a5c746f9116d125"
+        },
+        "sustain": {
+          "path": "states/sleepy-nod/sustain",
+          "frame_count": 5,
+          "durations_ms": [
+            320,
+            440,
+            400,
+            440,
+            330
+          ],
+          "duration_ms": 1930,
+          "mode": "loop",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "c345ee5af97c9f8f749ab534acf790535a4ebf21008a74387a5c746f9116d125",
+          "last_sha256": "c345ee5af97c9f8f749ab534acf790535a4ebf21008a74387a5c746f9116d125"
+        },
+        "exit": {
+          "path": "states/sleepy-nod/exit",
+          "frame_count": 5,
+          "durations_ms": [
+            140,
+            160,
+            160,
+            160,
+            120
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "c345ee5af97c9f8f749ab534acf790535a4ebf21008a74387a5c746f9116d125",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/sleepy-nod/demo-transparent.gif",
+      "transparent_demo": "states/sleepy-nod/demo-transparent.gif",
+      "demo_duration_ms": 10690,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 4,
+      "repeat_policy": "repeat_sustain_only_until_exit_requested"
+    },
+    {
+      "id": "sneeze",
+      "name": "打个小喷嚏",
+      "mode": "oneshot",
+      "entry_anchor_source_frame": 2,
+      "exit_anchor_source_frame": 5,
+      "sustain_source_order": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "sustain_source_kind": "existing_in_state_subset",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/sneeze/enter",
+          "frame_count": 5,
+          "durations_ms": [
+            120,
+            160,
+            160,
+            160,
+            140
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "439d1207e7a07ba8e07a908e4d2ba2fa3173c12bea257ff219024c3aad4a4789"
+        },
+        "sustain": {
+          "path": "states/sneeze/sustain",
+          "frame_count": 4,
+          "durations_ms": [
+            200,
+            130,
+            100,
+            180
+          ],
+          "duration_ms": 610,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "439d1207e7a07ba8e07a908e4d2ba2fa3173c12bea257ff219024c3aad4a4789",
+          "last_sha256": "12ef547134f4f3647031978095779ea9d0eabfb20b69325f082d44a7451f3c39"
+        },
+        "exit": {
+          "path": "states/sneeze/exit",
+          "frame_count": 5,
+          "durations_ms": [
+            140,
+            160,
+            160,
+            160,
+            120
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "12ef547134f4f3647031978095779ea9d0eabfb20b69325f082d44a7451f3c39",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/sneeze/demo-transparent.gif",
+      "transparent_demo": "states/sneeze/demo-transparent.gif",
+      "demo_duration_ms": 3700,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 1,
+      "repeat_policy": "play_once_then_exit"
+    },
+    {
+      "id": "brave-gaze",
+      "name": "鼓起勇气对视",
+      "mode": "loop",
+      "entry_anchor_source_frame": 5,
+      "exit_anchor_source_frame": 5,
+      "sustain_source_order": [
+        5,
+        6,
+        7,
+        5
+      ],
+      "sustain_source_kind": "existing_in_state_subset",
+      "semantic_revision": "2.0",
+      "phases": {
+        "enter": {
+          "path": "states/brave-gaze/enter",
+          "frame_count": 5,
+          "durations_ms": [
+            120,
+            160,
+            160,
+            160,
+            140
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+          "last_sha256": "a0f6c242f518fcd570809a28e3eced376a07663c8edd9e563bdd34eb441a3fbb"
+        },
+        "sustain": {
+          "path": "states/brave-gaze/sustain",
+          "frame_count": 4,
+          "durations_ms": [
+            420,
+            110,
+            850,
+            430
+          ],
+          "duration_ms": 1810,
+          "mode": "loop",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a0f6c242f518fcd570809a28e3eced376a07663c8edd9e563bdd34eb441a3fbb",
+          "last_sha256": "a0f6c242f518fcd570809a28e3eced376a07663c8edd9e563bdd34eb441a3fbb"
+        },
+        "exit": {
+          "path": "states/brave-gaze/exit",
+          "frame_count": 5,
+          "durations_ms": [
+            140,
+            160,
+            160,
+            160,
+            120
+          ],
+          "duration_ms": 740,
+          "mode": "oneshot",
+          "strip": "strip.png",
+          "gif": "clip.gif",
+          "first_sha256": "a0f6c242f518fcd570809a28e3eced376a07663c8edd9e563bdd34eb441a3fbb",
+          "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+        }
+      },
+      "demo": "states/brave-gaze/demo-transparent.gif",
+      "transparent_demo": "states/brave-gaze/demo-transparent.gif",
+      "demo_duration_ms": 10110,
+      "pivot": [
+        96,
+        202
+      ],
+      "demo_sustain_cycles": 4,
+      "repeat_policy": "repeat_sustain_only_until_exit_requested"
+    }
+  ],
+  "gaze_family": {
+    "id": "gaze",
+    "name": "16方向注视",
+    "mode": "parameterized_hold",
+    "coordinate_system": "viewer; 0 up, 90 right, 180 down, 270 left",
+    "midpoint_reuse": "The mild head/eye movement is physically reversible; entry midpoint is reused for exit.",
+    "variants": [
+      {
+        "angle_degrees": 0.0,
+        "id": "000_0",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/000_0/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "ba4be3ac8f907e1306700fab2409e27d66fcf3b85499940e9a378ba5690d1775"
+          },
+          "sustain": {
+            "path": "gaze/000_0/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "ba4be3ac8f907e1306700fab2409e27d66fcf3b85499940e9a378ba5690d1775",
+            "last_sha256": "ba4be3ac8f907e1306700fab2409e27d66fcf3b85499940e9a378ba5690d1775"
+          },
+          "exit": {
+            "path": "gaze/000_0/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "ba4be3ac8f907e1306700fab2409e27d66fcf3b85499940e9a378ba5690d1775",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/000_0/demo-transparent.gif",
+        "transparent_demo": "gaze/000_0/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 22.5,
+        "id": "022_5",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/022_5/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "1d1378516e9999670dd08d97a3d9c2d676bf890d11b6a6f2ed22d1676a63565f"
+          },
+          "sustain": {
+            "path": "gaze/022_5/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "1d1378516e9999670dd08d97a3d9c2d676bf890d11b6a6f2ed22d1676a63565f",
+            "last_sha256": "1d1378516e9999670dd08d97a3d9c2d676bf890d11b6a6f2ed22d1676a63565f"
+          },
+          "exit": {
+            "path": "gaze/022_5/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "1d1378516e9999670dd08d97a3d9c2d676bf890d11b6a6f2ed22d1676a63565f",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/022_5/demo-transparent.gif",
+        "transparent_demo": "gaze/022_5/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 45.0,
+        "id": "045_0",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/045_0/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "5fab1302a02725f7f077734255553f83a81fcfec680837597108ba4a1d278bcf"
+          },
+          "sustain": {
+            "path": "gaze/045_0/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "5fab1302a02725f7f077734255553f83a81fcfec680837597108ba4a1d278bcf",
+            "last_sha256": "5fab1302a02725f7f077734255553f83a81fcfec680837597108ba4a1d278bcf"
+          },
+          "exit": {
+            "path": "gaze/045_0/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "5fab1302a02725f7f077734255553f83a81fcfec680837597108ba4a1d278bcf",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/045_0/demo-transparent.gif",
+        "transparent_demo": "gaze/045_0/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 67.5,
+        "id": "067_5",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/067_5/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "58c789580019d4abfef3b7639a19f4aa7d41a434c3b24c7114c33085785d487a"
+          },
+          "sustain": {
+            "path": "gaze/067_5/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "58c789580019d4abfef3b7639a19f4aa7d41a434c3b24c7114c33085785d487a",
+            "last_sha256": "58c789580019d4abfef3b7639a19f4aa7d41a434c3b24c7114c33085785d487a"
+          },
+          "exit": {
+            "path": "gaze/067_5/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "58c789580019d4abfef3b7639a19f4aa7d41a434c3b24c7114c33085785d487a",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/067_5/demo-transparent.gif",
+        "transparent_demo": "gaze/067_5/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 90.0,
+        "id": "090_0",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/090_0/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "bb648661506d3fb71937d0095a747ecc8a6724e23112f43fbec77d1e77a1ec2e"
+          },
+          "sustain": {
+            "path": "gaze/090_0/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "bb648661506d3fb71937d0095a747ecc8a6724e23112f43fbec77d1e77a1ec2e",
+            "last_sha256": "bb648661506d3fb71937d0095a747ecc8a6724e23112f43fbec77d1e77a1ec2e"
+          },
+          "exit": {
+            "path": "gaze/090_0/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "bb648661506d3fb71937d0095a747ecc8a6724e23112f43fbec77d1e77a1ec2e",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/090_0/demo-transparent.gif",
+        "transparent_demo": "gaze/090_0/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 112.5,
+        "id": "112_5",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/112_5/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "d4d1d37bf8f6dce89d0df70c873359ba71b2d5033f3842a480372f7dd51f7111"
+          },
+          "sustain": {
+            "path": "gaze/112_5/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "d4d1d37bf8f6dce89d0df70c873359ba71b2d5033f3842a480372f7dd51f7111",
+            "last_sha256": "d4d1d37bf8f6dce89d0df70c873359ba71b2d5033f3842a480372f7dd51f7111"
+          },
+          "exit": {
+            "path": "gaze/112_5/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "d4d1d37bf8f6dce89d0df70c873359ba71b2d5033f3842a480372f7dd51f7111",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/112_5/demo-transparent.gif",
+        "transparent_demo": "gaze/112_5/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 135.0,
+        "id": "135_0",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/135_0/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "5e49556d3ab9bad711ad502b8db8a333b1a2a75ae64663cc6e527ff157b66e86"
+          },
+          "sustain": {
+            "path": "gaze/135_0/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "5e49556d3ab9bad711ad502b8db8a333b1a2a75ae64663cc6e527ff157b66e86",
+            "last_sha256": "5e49556d3ab9bad711ad502b8db8a333b1a2a75ae64663cc6e527ff157b66e86"
+          },
+          "exit": {
+            "path": "gaze/135_0/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "5e49556d3ab9bad711ad502b8db8a333b1a2a75ae64663cc6e527ff157b66e86",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/135_0/demo-transparent.gif",
+        "transparent_demo": "gaze/135_0/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 157.5,
+        "id": "157_5",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/157_5/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "634a97cf0e715fbd559f1fc193096791ab242d0f69cc3a2b8c27163bd1346d42"
+          },
+          "sustain": {
+            "path": "gaze/157_5/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "634a97cf0e715fbd559f1fc193096791ab242d0f69cc3a2b8c27163bd1346d42",
+            "last_sha256": "634a97cf0e715fbd559f1fc193096791ab242d0f69cc3a2b8c27163bd1346d42"
+          },
+          "exit": {
+            "path": "gaze/157_5/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "634a97cf0e715fbd559f1fc193096791ab242d0f69cc3a2b8c27163bd1346d42",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/157_5/demo-transparent.gif",
+        "transparent_demo": "gaze/157_5/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 180.0,
+        "id": "180_0",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/180_0/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "5f68777ca1dd3c37cda3a558232de649494fa2317935ccc0a445a6d0c9730637"
+          },
+          "sustain": {
+            "path": "gaze/180_0/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "5f68777ca1dd3c37cda3a558232de649494fa2317935ccc0a445a6d0c9730637",
+            "last_sha256": "5f68777ca1dd3c37cda3a558232de649494fa2317935ccc0a445a6d0c9730637"
+          },
+          "exit": {
+            "path": "gaze/180_0/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "5f68777ca1dd3c37cda3a558232de649494fa2317935ccc0a445a6d0c9730637",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/180_0/demo-transparent.gif",
+        "transparent_demo": "gaze/180_0/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 202.5,
+        "id": "202_5",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/202_5/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "ec5cb1667b479a6dfbae029fc154502579977f12bbe866840a031fb22fc433fd"
+          },
+          "sustain": {
+            "path": "gaze/202_5/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "ec5cb1667b479a6dfbae029fc154502579977f12bbe866840a031fb22fc433fd",
+            "last_sha256": "ec5cb1667b479a6dfbae029fc154502579977f12bbe866840a031fb22fc433fd"
+          },
+          "exit": {
+            "path": "gaze/202_5/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "ec5cb1667b479a6dfbae029fc154502579977f12bbe866840a031fb22fc433fd",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/202_5/demo-transparent.gif",
+        "transparent_demo": "gaze/202_5/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 225.0,
+        "id": "225_0",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/225_0/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "d6f57034a41da807f5560f50ec94193172708587c6c009aa5107b24be854aed1"
+          },
+          "sustain": {
+            "path": "gaze/225_0/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "d6f57034a41da807f5560f50ec94193172708587c6c009aa5107b24be854aed1",
+            "last_sha256": "d6f57034a41da807f5560f50ec94193172708587c6c009aa5107b24be854aed1"
+          },
+          "exit": {
+            "path": "gaze/225_0/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "d6f57034a41da807f5560f50ec94193172708587c6c009aa5107b24be854aed1",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/225_0/demo-transparent.gif",
+        "transparent_demo": "gaze/225_0/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 247.5,
+        "id": "247_5",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/247_5/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "092c274d843e2925fe1c91d66a17e42fbde653e96df37ce4cf00244e08ac2e81"
+          },
+          "sustain": {
+            "path": "gaze/247_5/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "092c274d843e2925fe1c91d66a17e42fbde653e96df37ce4cf00244e08ac2e81",
+            "last_sha256": "092c274d843e2925fe1c91d66a17e42fbde653e96df37ce4cf00244e08ac2e81"
+          },
+          "exit": {
+            "path": "gaze/247_5/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "092c274d843e2925fe1c91d66a17e42fbde653e96df37ce4cf00244e08ac2e81",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/247_5/demo-transparent.gif",
+        "transparent_demo": "gaze/247_5/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 270.0,
+        "id": "270_0",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/270_0/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "0a8859001dfe7a71e100dd8e18d4c614977431577363cef33a54eea0e69f5e70"
+          },
+          "sustain": {
+            "path": "gaze/270_0/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "0a8859001dfe7a71e100dd8e18d4c614977431577363cef33a54eea0e69f5e70",
+            "last_sha256": "0a8859001dfe7a71e100dd8e18d4c614977431577363cef33a54eea0e69f5e70"
+          },
+          "exit": {
+            "path": "gaze/270_0/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "0a8859001dfe7a71e100dd8e18d4c614977431577363cef33a54eea0e69f5e70",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/270_0/demo-transparent.gif",
+        "transparent_demo": "gaze/270_0/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 292.5,
+        "id": "292_5",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/292_5/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "75348a1fa684f17c819e09feebf14e28ea0a536d95b7f7428228cb6528cac1b5"
+          },
+          "sustain": {
+            "path": "gaze/292_5/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "75348a1fa684f17c819e09feebf14e28ea0a536d95b7f7428228cb6528cac1b5",
+            "last_sha256": "75348a1fa684f17c819e09feebf14e28ea0a536d95b7f7428228cb6528cac1b5"
+          },
+          "exit": {
+            "path": "gaze/292_5/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "75348a1fa684f17c819e09feebf14e28ea0a536d95b7f7428228cb6528cac1b5",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/292_5/demo-transparent.gif",
+        "transparent_demo": "gaze/292_5/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 315.0,
+        "id": "315_0",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/315_0/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "ab6939b59a2a2696707f8afec2c5fd9db6f1875e4aa8d0d9e21412398f9a6dff"
+          },
+          "sustain": {
+            "path": "gaze/315_0/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "ab6939b59a2a2696707f8afec2c5fd9db6f1875e4aa8d0d9e21412398f9a6dff",
+            "last_sha256": "ab6939b59a2a2696707f8afec2c5fd9db6f1875e4aa8d0d9e21412398f9a6dff"
+          },
+          "exit": {
+            "path": "gaze/315_0/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "ab6939b59a2a2696707f8afec2c5fd9db6f1875e4aa8d0d9e21412398f9a6dff",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/315_0/demo-transparent.gif",
+        "transparent_demo": "gaze/315_0/demo-transparent.gif"
+      },
+      {
+        "angle_degrees": 337.5,
+        "id": "337_5",
+        "pivot": [
+          96,
+          202
+        ],
+        "mode": "hold",
+        "phases": {
+          "enter": {
+            "path": "gaze/337_5/enter",
+            "frame_count": 3,
+            "durations_ms": [
+              120,
+              140,
+              180
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+            "last_sha256": "73e8c0c38437e248ac54117908887ff70b80bbdbd39f05f29a866dc7f7135c04"
+          },
+          "sustain": {
+            "path": "gaze/337_5/sustain",
+            "frame_count": 1,
+            "durations_ms": [
+              1000
+            ],
+            "duration_ms": 1000,
+            "mode": "hold",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "73e8c0c38437e248ac54117908887ff70b80bbdbd39f05f29a866dc7f7135c04",
+            "last_sha256": "73e8c0c38437e248ac54117908887ff70b80bbdbd39f05f29a866dc7f7135c04"
+          },
+          "exit": {
+            "path": "gaze/337_5/exit",
+            "frame_count": 3,
+            "durations_ms": [
+              180,
+              140,
+              120
+            ],
+            "duration_ms": 440,
+            "mode": "oneshot",
+            "strip": "strip.png",
+            "gif": "clip.gif",
+            "first_sha256": "73e8c0c38437e248ac54117908887ff70b80bbdbd39f05f29a866dc7f7135c04",
+            "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+          }
+        },
+        "demo": "gaze/337_5/demo-transparent.gif",
+        "transparent_demo": "gaze/337_5/demo-transparent.gif"
+      }
+    ]
+  }
+}
