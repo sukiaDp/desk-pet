@@ -64,19 +64,19 @@ function gazeClip(a) {
 let ccState = 'idle', gaze = null;          // 目标
 let temp = null;                             // 临时动作 { key, until? }：开场小动作、随机小动作
 let drag = null, dragUntil = 0;              // 拖动时左右跑
-let idleSince = 0, nextRandom = 0, waitingSince = 0, sessions = null, praised = null;
+let idleSince = 0, nextRandom = 0, waitingSince = 0, praised = null;
+let gazeUntil = 0;   // 点击后的一小段时间里视线跟着鼠标
 let BORED_MS = 60e3;   // 等你回复超过 1 分钟还没人理 → 无聊等待
 let cur = null, phase = 'sustain', idx = 0, flip = false, until = 0;
 let frame = null;                            // 当前帧，供点穿判断
 
 function targetKey(now) {
-  if (drag && now < dragUntil && clips[drag]) return { key: drag };
-  if (temp && temp.random && ccState === 'idle' && gaze) temp = null;   // 鼠标一动就不做随机小动作了
-  if (temp && !(temp.until < now) && clips[temp.key]) return { key: temp.key };
+  if (drag && now < dragUntil && clips[drag]) return { key: drag, urgent: true };
+  if (temp && !(temp.until < now) && clips[temp.key]) return { key: temp.key, urgent: temp.urgent };
   temp = null;
+  if (gaze && now < gazeUntil) return gaze;
   if (ccState === 'idle') {
-    if (gaze) return gaze;
-    const idleFor = now - Math.max(idleSince, lastMove);
+    const idleFor = now - idleSince;
     if (idleFor > SLEEP_MS && clips['sleepy-nod']) return { key: 'sleepy-nod' };
     if (idleFor > SIT_MS && clips['sit-swing']) return { key: 'sit-swing' };
     // 站着发呆时偶尔做个小动作
@@ -107,8 +107,8 @@ function step(now) {
       cur = t.key; flip = !!t.flip; phase = 'sustain'; idx = 0; until = 0; same = true;
     }
     const c = clips[cur], frames = c.phases[phase];
-    // 视线保持帧可以马上打断；循环要播完这一圈再退出
-    const interrupt = !same && phase === 'sustain' && (c.mode === 'hold' || c.mode === 'parameterized_hold');
+    // 视线保持帧、以及拖动/点击这种主动操作可以马上打断；其他循环要播完这一圈再退出
+    const interrupt = !same && phase === 'sustain' && (c.mode === 'hold' || c.mode === 'parameterized_hold' || (t && t.urgent));
     if (interrupt) { phase = 'exit'; idx = 0; }
     else if (now >= until) {
       idx++;
@@ -154,35 +154,49 @@ function draw() {
 }
 
 // ---- 鼠标：视线 + 点穿 ----
-let through = null, lastMove = 0, last = [0, 0];
-listen('cursor', ({ payload: [px, py, ax, ay] }) => {
+let through = null;
+let dragging = false, dragLastX = 0, dragIdleAt = 0;
+listen('cursor', ({ payload: [px, py, ax] }) => {
+  // 拖动中：KWin 拖窗口时不发位置事件，直接看鼠标在屏幕上往哪边走；1.5 秒不动算拖完
+  if (dragging) {
+    const now = performance.now();
+    if (Math.abs(ax - dragLastX) > 2) {
+      drag = ax > dragLastX ? 'running-right' : 'running-left';
+      dragUntil = now + 400; dragIdleAt = now; dragLastX = ax;
+    } else if (now - dragIdleAt > 1500) { dragging = false; log('drag end'); }
+    return;
+  }
   const x = px / K - LEFT, y = py / K - TOP;
-  // 用屏幕绝对坐标判断鼠标动没动（拖动窗口不算）
-  if (Math.hypot(ax - last[0], ay - last[1]) > 2) { lastMove = performance.now(); last = [ax, ay]; }
   // 点穿：鼠标下是透明像素（或在窗口外）就让鼠标穿过去
   let hit = false;
   if (x >= 0 && y >= 0 && x < W && y < H) hit = ctx.getImageData(px | 0, py | 0, 1, 1).data[3] > 20;
   if (hit !== !through) { through = !hit; invoke('set_through', { on: through }); }
-  // 视线：鼠标最近 3 秒动过、而且不在桌宠身上
+  // 视线方向（只在点击后的一小段时间里用）；鼠标在她身上时不转头
   const dx = x - 96, dy = y - 80, far = Math.hypot(dx, dy) > 70;
-  if (far && performance.now() - lastMove < 3000) {
+  if (far) {
     const a = (Math.atan2(dx, -dy) * 180 / Math.PI + 360) % 360;
     gaze = gazeClip(Math.round(a / 22.5) * 22.5 % 360);
   } else gaze = null;
 });
 
-// 拖动；窗口在动时按方向播左右跑
-document.addEventListener('mousedown', e => {
-  if (e.button === 0) window.__TAURI__.window.getCurrentWindow().startDragging();
-});
-let lastX = null;
-listen('moved', ({ payload: [x] }) => {
-  if (lastX !== null && Math.abs(x - lastX) > 2) {
-    drag = x > lastX ? 'running-right' : 'running-left';
-    dragUntil = performance.now() + 400;
+// 按住移动超过几像素算拖动，没移动就松开算点击：点击行提裙礼，之后视线跟着鼠标一会儿
+let down = null;
+document.addEventListener('mousedown', e => { if (e.button === 0) down = [e.screenX, e.screenY]; });
+document.addEventListener('mousemove', e => {
+  if (down && Math.hypot(e.screenX - down[0], e.screenY - down[1]) > 4) {
+    dragging = true; dragLastX = e.screenX * devicePixelRatio; dragIdleAt = performance.now(); down = null;
+    window.__TAURI__.window.getCurrentWindow().startDragging();
   }
-  lastX = x;
 });
+document.addEventListener('mouseup', () => {
+  if (!down) return;
+  down = null;
+  const now = performance.now();
+  temp = { key: 'modest-curtsy', until: now + 3000, urgent: true };
+  gazeUntil = now + 3000 + 8000;
+  log('点击');
+});
+
 
 // ---- CC 状态轮询 ----
 async function poll() {
@@ -196,10 +210,6 @@ async function poll() {
     }
     ccState = r.state;
     const now = performance.now();
-    // 新开了 CC 会话：行个提裙礼
-    const total = Object.values(r.counts).reduce((a, b) => a + b, 0);
-    if (sessions !== null && total > sessions) { temp = { key: 'modest-curtsy', until: now + 3500 }; log('新会话'); }
-    sessions = total;
     // 被夸了：藏脸
     if (praised !== null && r.praised > praised) { temp = { key: 'hidden-blush', until: now + 4500 }; log('被夸'); }
     praised = r.praised;
@@ -217,7 +227,6 @@ invoke('pet_config').then(([k, debug]) => {
   if (debug) { DEBUG = true; SIT_MS = 8e3; SLEEP_MS = 16e3; RANDOM_MS = [3e3, 4e3]; BORED_MS = 8e3; }
 }).then(load).then(() => {
   idleSince = performance.now(); nextRandom = idleSince + RANDOM_MS[0];
-  temp = { key: 'modest-curtsy', until: idleSince + 3500 };   // 启动时行个礼
   log(`loaded ${Object.keys(clips).filter(k => !k.startsWith('gaze:'))} | ${Object.keys(clips).filter(k => k.startsWith('gaze:')).length} 个视线方向`);
   frame = { img: neutral, ms: 200 }; draw();
   const loop = now => { step(now); requestAnimationFrame(loop); };

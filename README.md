@@ -1,6 +1,6 @@
 # desk-pet
 
-羊角修女桌宠（Tauri v2）。透明置顶、透明处点穿、可拖动，空闲时视线跟着鼠标，头顶气泡显示 Claude Code 的状态。
+羊角修女桌宠（Tauri v2）。透明置顶、透明处点穿、可拖动。按 Claude Code 的状态切换动画，头顶气泡显示状态；点她一下会行提裙礼，然后看着鼠标一会儿。
 
 - 启动：`./desk-pet.sh`；退出：托盘图标 →「退出」（也可以在那里显示 / 隐藏）
 - 构建：`./build.sh`（Rust 工具链、编译产物都在 `/mnt/data2/desk-pet-build`）
@@ -20,10 +20,10 @@
 | 等你回复（权限、提问） | 先 startled-avert（吓一跳），再 waiting；超过 1 分钟没人理 → bored-wait（无聊等待） |
 | 完成 | 先 jumping（跳一下），再 waving（招手） |
 | 出错 | failed |
-| 空闲 | idle；鼠标动时视线跟随；偶尔随机 prayer-peek / sneeze / brave-gaze |
-| 空闲且鼠标 2 分钟没动 | sit-swing（坐下晃脚），5 分钟 sleepy-nod（打瞌睡） |
+| 空闲 | idle；偶尔随机 prayer-peek / sneeze / brave-gaze |
+| 空闲 2 分钟 | sit-swing（坐下晃脚），5 分钟 sleepy-nod（打瞌睡） |
 | 拖动 | running-left / running-right |
-| 桌宠启动、新开 CC 会话 | modest-curtsy（提裙礼） |
+| 点她一下 | modest-curtsy（提裙礼），之后 8 秒视线跟着鼠标（16 个方向） |
 | 你发给 CC 的消息里有夸奖（谢谢、辛苦、厉害、nice…） | hidden-blush（被夸后藏脸） |
 
 缺素材的动画会自动跳过。调试：`DESK_PET_DEBUG=1` 时把动画切换打到 stderr，并把空闲计时缩成 8 秒 / 16 秒。

@@ -103,19 +103,15 @@ fn main() {
                 })
                 .build(app)?;
 
-            // 鼠标位置推给前端：相对窗口 + 屏幕绝对坐标（物理像素）：用于视线和点穿判断
+            // 鼠标位置推给前端：相对窗口（视线、点穿）+ 屏幕横坐标（拖动方向），物理像素：用于视线和点穿判断
             let w = win.clone();
             thread::spawn(move || loop {
                 thread::sleep(Duration::from_millis(40));
                 if let (Ok(c), Ok(p)) = (w.cursor_position(), w.outer_position()) {
-                    let _ = w.emit("cursor", (c.x - p.x as f64, c.y - p.y as f64, c.x, c.y));
+                    let _ = w.emit("cursor", (c.x - p.x as f64, c.y - p.y as f64, c.x));
                 }
             });
             Ok(())
-        })
-        .on_window_event(|w, ev| {
-            // 窗口位置变化（拖动）推给前端，用来播左右跑
-            if let tauri::WindowEvent::Moved(p) = ev { let _ = w.emit("moved", (p.x, p.y)); }
         })
         .run(tauri::generate_context!())
         .expect("desk-pet failed");
