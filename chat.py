@@ -41,9 +41,9 @@ QScrollBar:vertical {{ background: transparent; width: 6px; }}
 QScrollBar::handle:vertical {{ background: {rgba(c['gold'], 0.55)}; border-radius: 3px; min-height: 30px; }}
 QScrollBar::add-line, QScrollBar::sub-line {{ height: 0; }}
 QScrollBar::add-page, QScrollBar::sub-page {{ background: transparent; }}
-QWidget#chat QLabel[role="user"] {{ color: {c['rubric']}; font-style: italic; font-size: 14px; padding: 6px 11px;
+QWidget#chat QLabel[role="user"] {{ color: {c['rubric']}; font-style: italic; font-size: 14px; padding: 7px 22px 9px 14px;
   background: {rgba(c['rubric'], 0.06)}; border: 1px solid {rgba(c['rubric'], 0.35)}; border-radius: 4px; }}
-QWidget#chat QLabel[role="cc"] {{ color: {c['ink']}; font-size: 14px; padding: 8px 12px;
+QWidget#chat QLabel[role="cc"] {{ color: {c['ink']}; font-size: 14px; padding: 9px 22px 12px 15px;
   background: {rgba('#fffaf0', 0.45)}; border: 1px solid {rgba(c['gold'], 0.45)}; border-radius: 4px; }}
 QWidget#chat QLabel[role="user"][pending="true"] {{ color: {c['muted']}; }}
 QWidget#chat QLabel#meta {{ color: {c['muted']}; font-size: 11px; font-style: italic; }}
@@ -155,6 +155,19 @@ def send(sid, item):
     msgs.append(item)
     write_json(inbox, {'msgs': msgs})
     return item
+
+
+class Framed(QLabel):
+    """书页外观的文字框：样式表画底色和细边，这里再补上角饰。"""
+    def __init__(self, color, k):
+        super().__init__()
+        self.color, self.k = color, k
+
+    def paintEvent(self, e):
+        super().paintEvent(e)
+        p = QPainter(self)
+        book.frame_ornaments(p, QRectF(self.rect()).adjusted(0.5, 0.5, -1.5, -1.5), self.color, self.k)
+        p.end()
 
 
 class ChatWindow(QWidget):
@@ -365,7 +378,8 @@ class ChatWindow(QWidget):
         self.list.addWidget(n)
 
     def add_msg(self, role, text, src=None, pending=False):
-        b = QLabel()
+        c = self.t['colors']
+        b = Framed(c['rubric'] if role == 'user' else c['gold'], self.k) if self.book else QLabel()
         b.setProperty('role', role)
         b.setProperty('pending', 'true' if pending else 'false')
         b.setTextFormat(Qt.MarkdownText if role == 'cc' else Qt.PlainText)

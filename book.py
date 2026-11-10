@@ -177,12 +177,12 @@ def curl(path, x, y, r, down):
     path.cubicTo(QPointF(x - r * 0.2, y + down * r * 1.4), QPointF(x - r * 0.3, y + down * r * 0.6), QPointF(x + r * 0.3, y + down * r * 0.6))
 
 
-def corner(p, x, y, sx, sy, gold):
+def corner(p, x, y, sx, sy, gold, scale=1.0):
     """页角花饰：沿两条边各一道细线，末端打卷，拐角处一片叶子和几个小圆点。sx / sy 决定朝哪个角。"""
     p.save()
     p.translate(x, y)
-    p.scale(sx, sy)
-    pen = QPen(gold, 1.2)
+    p.scale(sx * scale, sy * scale)
+    pen = QPen(gold, 1.2 / scale)
     pen.setCapStyle(Qt.RoundCap)
     for transpose in (False, True):              # 横一道、竖一道（竖的就是横的沿对角线翻过去）
         p.save()
@@ -209,7 +209,7 @@ def corner(p, x, y, sx, sy, gold):
     p.setPen(pen)
     p.setBrush(fill)
     p.drawPath(leaf)
-    p.setPen(QPen(gold, 0.8))
+    p.setPen(QPen(gold, 0.8 / scale))
     p.drawLine(QPointF(4, 4), QPointF(13, 13))   # 叶脉
     p.restore()
 
@@ -252,3 +252,24 @@ def divider(width, gold, rubric):
     flourish(p, width / 2, h / 2, width / 2 - 2, QColor(gold), QColor(rubric), cross_r=4)
     p.end()
     return pix
+
+
+def frame_ornaments(p, r, color, k=1.0):
+    """文字框的装饰：右下角一簇小藤蔓，左上角一个小角括，下边中间一粒小点。r 是边框矩形。"""
+    p.save()
+    p.setRenderHint(QPainter.Antialiasing)
+    c = QColor(color)
+    c.setAlpha(210)
+    corner(p, r.right() - 3, r.bottom() - 3, -1, -1, c, 0.42 * k)
+    pen = QPen(c, 1.1)
+    pen.setCapStyle(Qt.RoundCap)
+    p.setPen(pen)
+    n = 9 * k
+    x, y = r.left() + 3, r.top() + 3
+    p.drawLine(QPointF(x, y + n), QPointF(x, y))
+    p.drawLine(QPointF(x, y), QPointF(x + n, y))
+    p.setPen(Qt.NoPen)
+    p.setBrush(c)
+    p.drawEllipse(QPointF(x + 3 * k, y + 3 * k), 1.2 * k, 1.2 * k)
+    p.drawEllipse(QPointF(r.center().x(), r.bottom()), 1.6 * k, 1.6 * k)
+    p.restore()
