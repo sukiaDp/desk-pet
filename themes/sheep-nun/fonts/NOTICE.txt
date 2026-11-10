@@ -1,0 +1,5 @@
+这里的字体都按 SIL Open Font License 1.1 分发，许可证见同目录的 OFL-*.txt。
+
+ZCOOLXiaoWei-Regular.ttf 是修改过的版本：原版里「回圃圄圊崮徊」6 个字的内框方向画反了，
+按 TrueType 的非零填充规则会被填成实心方块。这 6 个字按奇偶填充重新计算了轮廓（skia-pathops），
+其余字形没有改动。原版来自 https://github.com/google/fonts/tree/main/ofl/zcoolxiaowei 。

@@ -35,6 +35,7 @@ DEFAULT = {
         'sending': '（发送中…）', 'perm': '终端里在等你批准：{tool}（权限只能在终端里点）',
         'new_reply': '有新回复，点我看', 'no_session': '没有开 /desk-pet 的会话：在 CC 里输入 /desk-pet',
         'activity': '正在{what}',
+        'file_note': '（附上了 {n} 个文件，路径如下，需要的话请读取：\n{paths}）',
         'image_note': '（附上了 {n} 张图片，请用 Read 工具查看：\n{paths}）',
     },
 }

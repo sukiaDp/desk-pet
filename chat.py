@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 
 from PySide6.QtCore import QEvent, QRectF, QSize, Qt, QTimer, QUrl
-from PySide6.QtGui import QColor, QFont, QFontMetrics, QIcon, QImage, QKeySequence, QGuiApplication, QPainter, QPainterPath, QPixmap
+from PySide6.QtGui import QColor, QFont, QFontMetrics, QIcon, QImage, QKeySequence, QPalette, QTextDocument, QGuiApplication, QPainter, QPainterPath, QPixmap
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFileDialog, QFrame, QHBoxLayout, QLabel, QLineEdit, QPushButton,
                                QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
@@ -77,6 +77,7 @@ QPushButton#send:disabled {{ background: {c['border']}; color: {c['muted']}; bor
 QPushButton#clip {{ background: transparent; border: none; padding: 0; }}
 QPushButton#clip:hover {{ background: {rgba(c['gold'], 0.18)}; border-radius: 6px; }}
 QLabel#thumb {{ border: 1px solid {c['gold']}; border-radius: 3px; }}
+QWidget#chat QLabel#filechip {{ border: 1px solid {c['gold']}; border-radius: 3px; padding: 4px 22px 4px 8px; font-size: 12px; }}
 QPushButton#unthumb {{ color: #fff; background: rgba(0,0,0,0.55); border: none; border-radius: 3px; padding: 0; font-size: 11px; }}
 QPushButton#close {{ color: {c['muted']}; background: transparent; border: none; padding: 0; font-size: 15px; }}
 QPushButton#close:hover {{ color: {c['rubric']}; }}
@@ -126,8 +127,58 @@ QPushButton#send:disabled {{ background: {c['border']}; color: {c['muted']}; bor
 QPushButton#clip {{ background: transparent; border: none; padding: 0; }}
 QPushButton#clip:hover {{ background: {rgba(c['gold'], 0.18)}; border-radius: 6px; }}
 QLabel#thumb {{ border: 1px solid {c['gold']}; border-radius: 3px; }}
+QWidget#chat QLabel#filechip {{ border: 1px solid {c['gold']}; border-radius: 3px; padding: 4px 22px 4px 8px; font-size: 12px; }}
 QPushButton#unthumb {{ color: #fff; background: rgba(0,0,0,0.55); border: none; border-radius: 3px; padding: 0; font-size: 11px; }}
 """
+
+
+def human_size(n):
+    for unit in ('B', 'KB', 'MB', 'GB'):
+        if n < 1024 or unit == 'GB':
+            return f'{n:.0f} {unit}' if unit == 'B' else f'{n:.1f} {unit}'
+        n /= 1024
+
+
+def file_chip(m, short=False):
+    """文件条上的字：▤ 名字 · 大小；文件夹 ▦ 名字/。"""
+    name = m.get('name') or Path(m.get('path', '')).name
+    if short and len(name) > 22:
+        name = name[:10] + '…' + name[-9:]
+    return f'▦ {name}/' if m.get('kind') == 'dir' else f'▤ {name} · {human_size(m.get("size", 0))}'
+
+
+_PATH = re.compile(r'(`?)(/(?:[\w.@+~-]+/)*[\w.@+~-]+/?)\1')
+
+
+def linkify(text):
+    """CC 回复里提到的、本机确实存在的绝对路径变成可点的链接（代码块里的不动）。"""
+    parts = text.split('```')
+    for i in range(0, len(parts), 2):            # 偶数段在代码块外
+        def sub(m):
+            tick, p = m.group(1), m.group(2)
+            start = m.start()
+            seg = parts[i]
+            if start >= 2 and seg[start - 2:start] == '](':  # 已经是链接
+                return m.group(0)
+            if p.count('/') < 2 or not Path(p).exists():
+                return m.group(0)
+            name = (Path(p).name or p) + ('/' if Path(p).is_dir() else '')   # 只显示名字，完整路径在链接里
+            return f'[{tick}{name}{tick}]({QUrl.fromLocalFile(p).toString()})'
+        parts[i] = _PATH.sub(sub, parts[i])
+    return '```'.join(parts)
+
+
+def image_paths(text):
+    """回复里提到的、本机存在的图片路径（代码块外，去重，最多 6 张）。"""
+    out = []
+    for i, seg in enumerate(text.split('```')):
+        if i % 2:
+            continue
+        for m in _PATH.finditer(seg):
+            p = m.group(2)
+            if Path(p).suffix.lower() in IMAGE_EXT and p not in out and Path(p).is_file():
+                out.append(p)
+    return out[:6]
 
 
 def round_avatar(img, box, size=34):
@@ -256,12 +307,13 @@ class ChatWindow(QWidget):
         self.clip = QPushButton()                # 回形针：选图片
         self.clip.setObjectName('clip')
         self.clip.setCursor(Qt.PointingHandCursor)
-        self.clip.setToolTip('附上图片（也可以拖进来，或在输入框里粘贴截图）')
-        self.clip.clicked.connect(self.pick_images)
+        self.clip.setToolTip('附上文件或图片（也可以直接拖进来，或在输入框里粘贴截图）')
+        self.clip.clicked.connect(self.pick_files)
         bottom.addWidget(self.clip)
         bottom.addWidget(self.input, 1)
         bottom.addWidget(self.btn)
         self.pending_imgs = []                   # 待发图片：[(QImage 或 None, 源文件路径 或 None)]
+        self.pending_files = []                  # 待发的其他文件 / 文件夹：路径（不复制，直接把原路径给 CC）
         self.tray = QWidget()                    # 待发缩略图一排
         self.tray_row = QHBoxLayout(self.tray)
         self.tray_row.setContentsMargins(0, 0, 0, 0)
@@ -289,6 +341,9 @@ class ChatWindow(QWidget):
             w, h = w - 20, h - 20
         self.k = k
         self.setStyleSheet(style(self.t, k))
+        pal = self.palette()                     # 文字里的链接用主题色，不用默认的亮蓝
+        pal.setColor(QPalette.Link, QColor(self.t['colors']['rubric' if self.book else 'accent']))
+        self.setPalette(pal)
         a = None
         if self.t.get('avatar') and not self.neutral.isNull():
             a = round_avatar(self.neutral, self.t['avatar'], round(34 * k))
@@ -474,18 +529,34 @@ class ChatWindow(QWidget):
         b.setProperty('role', role)
         b.setProperty('pending', 'true' if pending else 'false')
         imgs = [m['path'] for m in media or [] if m.get('kind') == 'image' and Path(m.get('path', '')).exists()]
-        if imgs:                                 # 带图：文字 + 缩略图，点图用系统看图打开
+        files = [m for m in media or [] if m.get('kind') in ('file', 'dir')]
+        chips = [file_chip(m) for m in files]
+        if imgs or files:                        # 带附件：文字 + 缩略图 / 文件条，点一下用系统默认程序打开
             w = round(150 * self.k)
             pics = ' '.join(f'<a href="{QUrl.fromLocalFile(p).toString()}"><img src="{QUrl.fromLocalFile(p).toString()}" width="{w}"></a>'
                             for p in imgs)
             body = html.escape(text).replace('\n', '<br>')
             align = 'right' if self.book and role == 'user' else 'left'
+            links = '<br>'.join(f'<a href="{QUrl.fromLocalFile(m["path"]).toString()}" style="color:{c["rubric"] if self.book else c["accent"]}">'
+                                f'{html.escape(label)}</a>' for m, label in zip(files, chips))
+            parts = [x for x in (body, pics, links) if x]
             b.setTextFormat(Qt.RichText)
-            b.setText(f'<div align="{align}">{body}{"<br>" if body else ""}{pics}'
+            b.setText(f'<div align="{align}">{"<br>".join(parts)}'
                       f'{"<br>" + html.escape(self.tx["sending"]) if pending else ""}</div>')
+        elif role == 'cc' and (shown := image_paths(text)):   # CC 提到的图片：直接显示在回复下面
+            imgs = shown
+            w = round(150 * self.k)
+            doc = QTextDocument()
+            doc.setMarkdown(linkify(text))
+            link = self.t['colors']['rubric' if self.book else 'accent']
+            body = doc.toHtml().replace('color:#0000ff', f'color:{link}')   # 转 HTML 时写死了默认蓝色，换成主题色
+            pics = ' '.join(f'<a href="{QUrl.fromLocalFile(p).toString()}"><img src="{QUrl.fromLocalFile(p).toString()}" width="{w}"></a>'
+                            for p in shown)
+            b.setTextFormat(Qt.RichText)
+            b.setText(body.replace('</body>', f'<p>{pics}</p></body>'))
         else:
             b.setTextFormat(Qt.MarkdownText if role == 'cc' else Qt.PlainText)
-            b.setText(text + ('\n' + self.tx['sending'] if pending else ''))
+            b.setText((linkify(text) if role == 'cc' else text) + ('\n' + self.tx['sending'] if pending else ''))
         b.setWordWrap(True)
         b.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.LinksAccessibleByMouse)
         b.setOpenExternalLinks(True)
@@ -503,6 +574,8 @@ class ChatWindow(QWidget):
         longest = max((fm.horizontalAdvance(line) for line in text.splitlines() or ['']), default=0)
         if imgs:                                 # 缩略图一行排几张
             longest = max(longest, min(len(imgs), 3) * (round(150 * self.k) + 6))
+        if chips:
+            longest = max([longest] + [fm.horizontalAdvance(x) for x in chips])
         b.setMinimumWidth(min(int(longest * 1.05) + round(44 * self.k), maxw))   # 加上文字框的内边距和边框，留点余量
         if self.book and role == 'user':
             b.setAlignment(Qt.AlignRight)
@@ -617,9 +690,9 @@ class ChatWindow(QWidget):
     # ---- 发消息 ----
     def on_send(self):
         text = self.input.text().strip()
-        if not (text or self.pending_imgs) or not self.sid:
+        if not (text or self.pending_imgs or self.pending_files) or not self.sid:
             return
-        item = {'text': text}
+        item, notes = {'text': text}, []
         if self.pending_imgs:                    # 图片存到 media/<会话>/，消息里写上路径，CC 用 Read 看
             d = MEDIA / self.sid
             d.mkdir(parents=True, exist_ok=True)
@@ -633,20 +706,36 @@ class ChatWindow(QWidget):
                     img.save(str(dst), 'PNG')
                 paths.append(str(dst))
             item['media'] = [{'kind': 'image', 'path': p} for p in paths]
-            note = self.tx['image_note'].format(n=len(paths), paths='\n'.join(paths))
-            item['prompt'] = f'{text}\n\n{note}' if text else note
+            notes.append(self.tx['image_note'].format(n=len(paths), paths='\n'.join(paths)))
             self.pending_imgs = []
+        if self.pending_files:                   # 其他文件：不复制，原路径给 CC
+            fs = [{'kind': 'dir' if Path(p).is_dir() else 'file', 'path': p, 'name': Path(p).name,
+                   'size': 0 if Path(p).is_dir() else Path(p).stat().st_size} for p in self.pending_files if Path(p).exists()]
+            item['media'] = item.get('media', []) + fs
+            notes.append(self.tx['file_note'].format(n=len(fs), paths='\n'.join(
+                f['path'] + ('/（文件夹）' if f['kind'] == 'dir' else f'（{human_size(f["size"])}）') for f in fs)))
+            self.pending_files = []
+        if notes:
+            item['prompt'] = '\n\n'.join(([text] if text else []) + notes)
             self.draw_tray()
         send(self.sid, item)
         self.input.clear()
         self.refresh()
 
-    # ---- 图片：选、拖、粘贴 ----
-    def pick_images(self):
-        files, _ = QFileDialog.getOpenFileNames(self, '选图片', str(Path.home()),
-                                                '图片 (' + ' '.join(f'*{e}' for e in sorted(IMAGE_EXT)) + ')')
+    # ---- 附件：选、拖、粘贴；图片走图片，其他文件 / 文件夹走文件 ----
+    def pick_files(self):
+        files, _ = QFileDialog.getOpenFileNames(self, '选文件', str(Path.home()))
         for f in files:
-            self.add_image(src=f)
+            self.add_path(f)
+
+    def add_path(self, p):
+        if not p or not Path(p).exists():
+            return
+        if Path(p).is_file() and Path(p).suffix.lower() in IMAGE_EXT:
+            self.add_image(src=p)
+        elif p not in self.pending_files:
+            self.pending_files.append(p)
+            self.draw_tray()
 
     def add_image(self, img=None, src=None):
         if src and Path(src).suffix.lower() not in IMAGE_EXT:
@@ -662,6 +751,7 @@ class ChatWindow(QWidget):
         while self.tray_row.count():
             w = self.tray_row.takeAt(0).widget()
             if w:
+                w.hide()                         # 先藏起来：deleteLater 要等下一轮事件才删，不然会叠在新卡片下面
                 w.deleteLater()
         n = round(54 * self.k)
         for i, (img, _) in enumerate(self.pending_imgs):
@@ -676,8 +766,24 @@ class ChatWindow(QWidget):
             x.setCursor(Qt.PointingHandCursor)
             x.clicked.connect(lambda _=False, i=i: (self.pending_imgs.pop(i), self.draw_tray()))
             self.tray_row.addWidget(cell)
+        for i, p in enumerate(self.pending_files):   # 文件：一张小卡片，文件名 + 大小
+            q = Path(p)
+            m = {'kind': 'dir' if q.is_dir() else 'file', 'name': q.name, 'size': 0 if q.is_dir() else q.stat().st_size}
+            cell = QLabel(file_chip(m, short=True))
+            cell.setObjectName('filechip')
+            cell.setFixedHeight(n)
+            cell.setToolTip(p)
+            x = QPushButton('✕', cell)
+            x.setObjectName('unthumb')
+            x.setFixedSize(round(18 * self.k), round(18 * self.k))
+            cell.adjustSize()
+            cell.setFixedWidth(min(max(cell.sizeHint().width() + x.width(), n * 2), n * 4))
+            x.move(cell.width() - x.width(), 0)
+            x.setCursor(Qt.PointingHandCursor)
+            x.clicked.connect(lambda _=False, i=i: (self.pending_files.pop(i), self.draw_tray()))
+            self.tray_row.addWidget(cell)
         self.tray_row.addStretch(1)
-        self.tray.setVisible(bool(self.pending_imgs))
+        self.tray.setVisible(bool(self.pending_imgs or self.pending_files))
 
     def eventFilter(self, obj, e):
         if obj is self.input and e.type() == QEvent.KeyPress and e.matches(QKeySequence.Paste):
@@ -685,23 +791,23 @@ class ChatWindow(QWidget):
             if md.hasImage():                    # 剪贴板里是截图
                 self.add_image(img=QImage(md.imageData()))
                 return True
-            files = [u.toLocalFile() for u in md.urls() if Path(u.toLocalFile()).suffix.lower() in IMAGE_EXT]
-            if files:                            # 复制的是图片文件
+            files = [u.toLocalFile() for u in md.urls() if u.isLocalFile()]
+            if files:                            # 在文件管理器里复制的文件
                 for f in files:
-                    self.add_image(src=f)
+                    self.add_path(f)
                 return True
         return super().eventFilter(obj, e)
 
     def dragEnterEvent(self, e):
         md = e.mimeData()
-        if md.hasImage() or any(Path(u.toLocalFile()).suffix.lower() in IMAGE_EXT for u in md.urls()):
+        if md.hasImage() or any(u.isLocalFile() for u in md.urls()):
             e.acceptProposedAction()
 
     def dropEvent(self, e):
         md = e.mimeData()
-        files = [u.toLocalFile() for u in md.urls() if Path(u.toLocalFile()).suffix.lower() in IMAGE_EXT]
+        files = [u.toLocalFile() for u in md.urls() if u.isLocalFile()]
         for f in files:
-            self.add_image(src=f)
+            self.add_path(f)
         if not files and md.hasImage():
             self.add_image(img=QImage(md.imageData()))
         e.acceptProposedAction()
