@@ -21,10 +21,12 @@ from PySide6.QtGui import (QAction, QBitmap, QColor, QCursor, QFont, QGuiApplica
                            QPainter, QPixmap, QRegion, QTransform)
 from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon, QWidget
 
+import theme
 from chat import ChatWindow
 
 ROOT = Path(__file__).resolve().parent
-ASSETS = Path(os.environ.get('DESK_PET_ASSETS') or ROOT / 'assets')
+THEME = theme.load()                                         # 形象：themes/<id>/（见 theme.py）
+ASSETS = THEME['assets']
 SESSIONS = Path.home() / '.cache/desk-pet/sessions'
 ALIVE = Path.home() / '.cache/desk-pet/pet.json'      # 桌宠心跳：mod 据此决定提问发不发到聊天窗
 K = max(1, int(os.environ.get('DESK_PET_SCALE') or 1))     # 整数放大倍数
@@ -91,6 +93,8 @@ def cc_state():
         st = v.get('state', '')
         if st == 'ended' or age > 86400:
             p.unlink(missing_ok=True)
+            for f in (SESSIONS.parent / 'chat').glob(f'{p.stem}.*'):   # 这个会话的聊天文件也清掉
+                f.unlink(missing_ok=True)
             continue
         if age > 180:
             continue
@@ -99,6 +103,12 @@ def cc_state():
         if st in ('done', 'error') and age > 120:
             st = 'idle'
         counts[st] = counts.get(st, 0) + 1
+    for f in (SESSIONS.parent / 'chat').glob('*'):                 # 会话文件已经没了的聊天记录，放一天后清掉
+        try:
+            if not (SESSIONS / f'{f.name.split(".")[0]}.json').exists() and now - f.stat().st_mtime > 86400:
+                f.unlink()
+        except OSError:
+            pass
     live = [x[:3] for x in sorted(live, key=lambda x: -x[3])]       # 最近有动静的会话排前面
     return next((s for s in PRIORITY if s in counts), 'idle'), counts, praised, live
 
@@ -138,7 +148,7 @@ class Pet(QWidget):
         self.frame = self.neutral
         # 鼠标
         self.press = None
-        self.chat = ChatWindow()
+        self.chat = ChatWindow(THEME, self.neutral)
         self.chat.pet = self
 
         g = QGuiApplication.primaryScreen().availableGeometry()
@@ -261,13 +271,14 @@ class Pet(QWidget):
         if self.bubble and not self.bubble_off:
             p.scale(K, K)
             p.setRenderHint(QPainter.Antialiasing)
-            p.setPen(QColor(0, 0, 0, 50))
-            p.setBrush(QColor('#fff'))
+            c = THEME['colors']
+            p.setPen(QColor(c['bubble_border']))
+            p.setBrush(QColor(c['bubble_bg']))
             p.drawRoundedRect(8, 4, 184, 22, 11, 11)
-            f = QFont()
+            f = QFont(THEME['font']) if THEME['font'] else QFont()
             f.setPixelSize(12)
             p.setFont(f)
-            p.setPen(QColor('#333'))
+            p.setPen(QColor(c['bubble_ink']))
             p.drawText(QRect(8, 4, 184, 22), Qt.AlignCenter, self.bubble)
         p.end()
         self.setMask(QRegion(QBitmap.fromImage(self.canvas.createAlphaMask())))
@@ -353,7 +364,7 @@ class Pet(QWidget):
         others = ''.join(f' +{v} {LABEL.get(k, k)}' for k, v in counts.items() if k not in (state, 'idle') and v > 0)
         text = LABEL[state] + (f' ×{n}' if n > 1 else '') + others if LABEL[state] else ''
         if self.chat.unread:
-            text = '有新回复，点我看'
+            text = THEME['text']['new_reply']
         if text != self.bubble:
             self.bubble, self.bubble_off = text, False
             self.render()
@@ -367,11 +378,16 @@ def main():
     pet.show()
 
     tray = QSystemTrayIcon(QIcon(QPixmap.fromImage(pet.neutral)), app)
-    tray.setToolTip('羊角修女')
+    tray.setToolTip(THEME['name'])
     menu = QMenu()
     chat = QAction('聊天', menu)
     chat.triggered.connect(lambda: pet.chat.open_near(pet))
     menu.addAction(chat)
+    looks = menu.addMenu('形象')                  # 换形象：记下选择，重启自己
+    for tid, name in theme.available():
+        a = QAction(name, looks, checkable=True, checked=tid == THEME['id'])
+        a.triggered.connect(lambda _=False, tid=tid: (theme.choose(tid), os.execv(sys.executable, [sys.executable, *sys.argv])))
+        looks.addAction(a)
     toggle = QAction('显示 / 隐藏', menu)
     toggle.triggered.connect(lambda: pet.setVisible(not pet.isVisible()))
     quit_ = QAction('退出', menu)

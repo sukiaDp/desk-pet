@@ -5,10 +5,19 @@
 - 首次准备：`./setup.sh`（在 `/mnt/data2/desk-pet-build/venv` 建 Python 3.12 venv 装 PySide6；3.10 上 PySide6 会崩）
 - 启动：`./desk-pet.sh`；退出：托盘图标 →「退出」（也可以在那里显示 / 隐藏）
 - 放大：`DESK_PET_SCALE=2 ./desk-pet.sh`（整数倍）
-- 素材：`assets/` 是 1–6 号完整状态包解压后的原样内容，运行时直接读。提裙礼、被夸后藏脸、无聊等待三个附加包整理成 `assets/states/<id>/` 并列在 `assets/extra-states.json`。原始 zip 在 `source-zips/`（不进 git）。
+- 形象：每个形象一个目录 `themes/<id>/`，里面是 `theme.json`（名字、配色、字体、头像位置、界面文字）和素材 `assets/`。托盘「形象」菜单切换；也可以 `DESK_PET_THEME=<id>`。加新形象就是复制一个目录改掉，没写的字段用 `theme.py` 里的默认值。
+- 羊角修女（`themes/sheep-nun`）：`assets/` 是 1–6 号完整状态包解压后的原样内容；提裙礼、被夸后藏脸、无聊等待三个附加包整理成 `assets/states/<id>/` 并列在 `assets/extra-states.json`。原始 zip 在 `source-zips/`（不进 git）。
 - 以前的 Tauri v2 版本在 `tauri` 分支（Linux 上 WebKitGTK 透明窗口拖动后有重影，所以换了 Qt）。
 
-## 和 CC 联动
+## 聊天小窗
+
+双击桌宠（或托盘「聊天」）打开，像 TG 一样给开了 `/desk-pet` 的会话发消息、看回复；终端里的对话也会同步过来。开了多个会话时顶上可以切换。
+
+- 窗口没开时来了回复，头顶气泡提示，点她一下就打开。
+- 从小窗发起的那一轮里，CC 用提问工具给的选项会显示成按钮（多选是勾选框），点了就回答；终端里同时也有对话框，哪边先答都行。
+- 工具权限只能在终端里批准，小窗只提醒在等哪个工具。
+- 只有终端里开着的会话能聊；CC 正在忙时发的消息会排队。
+
 
 `cc-mod/` 是一个 CC mod（已装在用户级：`desk-pet@local-mods`），**按会话开启**：默认不推送，在会话里输入 `/desk-pet` 打开、再输入一次关闭（也可以 `/desk-pet on|off`）；用 `DESK_PET=1 claude` 启动的会话默认打开。打开时提示框右下角显示绿色「● 桌宠」。等你回复只在真的弹出权限对话框时才算（auto 模式自动放行的不算）。
 

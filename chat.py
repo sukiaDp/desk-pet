@@ -11,28 +11,61 @@ import time
 from pathlib import Path
 
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QGuiApplication
+from PySide6.QtGui import QFont, QGuiApplication, QPainter, QPainterPath, QPixmap
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel, QLineEdit, QPushButton,
                                QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
 CHAT = Path.home() / '.cache/desk-pet/chat'
 STATE_LABEL = {'working': '工作中', 'reading': '查看中', 'waiting': '等你回复', 'done': '完成啦', 'error': '出错了', 'idle': '空闲'}
 
-STYLE = """
-QWidget#chat { background: #e7ebf0; }
-QScrollArea, QWidget#msgs { background: transparent; border: none; }
-QLabel[role="user"] { background: #d7f5c4; border-radius: 10px; padding: 6px 9px; color: #1d2a18; }
-QLabel[role="cc"] { background: #ffffff; border-radius: 10px; padding: 6px 9px; color: #222; }
-QLabel[pending="true"] { color: #888; }
-QLabel#meta { color: #8a929a; font-size: 11px; }
-QLabel#perm { background: #fff3cd; color: #6b5200; border-radius: 6px; padding: 5px 8px; }
-QFrame#ask { background: #ffffff; border: 1px solid #c9d3dd; border-radius: 10px; }
-QPushButton[opt="true"] { text-align: left; padding: 6px 9px; border: 1px solid #b8c6d4; border-radius: 8px; background: #f5f8fb; }
-QPushButton[opt="true"]:checked { background: #cfe6ff; border-color: #5c9ded; }
-QLineEdit { padding: 7px 9px; border: 1px solid #c9d3dd; border-radius: 16px; background: #fff; }
-QPushButton#send { padding: 6px 14px; border-radius: 14px; background: #3d8ee6; color: white; border: none; }
-QPushButton#send:disabled { background: #a9c5e4; }
+def style(t):
+    """按主题配色生成样式表；每个控件都写明颜色，不吃系统深色主题。"""
+    c = t['colors']
+    font = f"QWidget#chat, QWidget#chat * {{ font-family: '{t['font']}'; }}" if t['font'] else ''
+    return font + f"""
+QWidget#chat {{ background: {c['bg']}; color: {c['ink']}; }}
+QWidget#chat QLabel, QWidget#chat QCheckBox {{ color: {c['ink']}; }}
+QScrollArea, QWidget#msgs {{ background: transparent; border: none; }}
+QScrollBar:vertical {{ background: transparent; width: 8px; }}
+QScrollBar::handle:vertical {{ background: {c['border']}; border-radius: 4px; min-height: 30px; }}
+QScrollBar::add-line, QScrollBar::sub-line {{ height: 0; }}
+QWidget#chat QLabel[role="user"] {{ background: {c['user_bg']}; color: {c['user_ink']}; border-radius: 12px; padding: 7px 10px; }}
+QWidget#chat QLabel[role="cc"] {{ background: {c['pet_bg']}; color: {c['pet_ink']}; border: 1px solid {c['border']}; border-radius: 12px; padding: 7px 10px; }}
+QWidget#chat QLabel[role="user"][pending="true"] {{ color: {c['muted']}; }}
+QWidget#chat QLabel#meta {{ color: {c['muted']}; font-size: 11px; }}
+QWidget#chat QLabel#perm {{ background: {c['warn_bg']}; color: {c['warn_ink']}; border-radius: 8px; padding: 6px 9px; }}
+QFrame#ask {{ background: {c['panel']}; border: 1px solid {c['gold']}; border-radius: 12px; }}
+QFrame#ask QLabel {{ background: transparent; }}
+QPushButton {{ color: {c['ink']}; background: {c['panel']}; border: 1px solid {c['border']}; border-radius: 8px; padding: 5px 12px; }}
+QPushButton:hover {{ border-color: {c['gold']}; }}
+QPushButton[opt="true"] {{ text-align: left; padding: 7px 10px; }}
+QPushButton[opt="true"]:checked {{ background: {c['gold']}; color: {c['accent_ink']}; border-color: {c['accent']}; }}
+QCheckBox {{ spacing: 8px; padding: 3px 0; }}
+QCheckBox::indicator {{ width: 15px; height: 15px; border: 1px solid {c['gold']}; border-radius: 4px; background: {c['panel']}; }}
+QCheckBox::indicator:checked {{ background: {c['gold']}; border-color: {c['accent']}; }}
+QComboBox {{ color: {c['ink']}; background: {c['panel']}; border: 1px solid {c['border']}; border-radius: 8px; padding: 4px 9px; }}
+QComboBox QAbstractItemView {{ color: {c['ink']}; background: {c['panel']}; selection-background-color: {c['gold']}; }}
+QLineEdit {{ color: {c['ink']}; padding: 7px 11px; border: 1px solid {c['border']}; border-radius: 16px; background: {c['panel']}; }}
+QLineEdit:focus {{ border-color: {c['gold']}; }}
+QPushButton#send {{ padding: 6px 16px; border-radius: 15px; background: {c['accent']}; color: {c['accent_ink']}; border: 1px solid {c['gold']}; }}
+QPushButton#send:disabled {{ background: {c['border']}; color: {c['muted']}; border-color: {c['border']}; }}
 """
+
+
+def round_avatar(img, box, size=34):
+    """从默认姿态图里裁出头像，最近邻放大（像素画不糊），裁成圆形。"""
+    x, y, n = box
+    src = QPixmap.fromImage(img.copy(x, y, n, n)).scaled(size, size, Qt.KeepAspectRatio, Qt.FastTransformation)
+    out = QPixmap(size, size)
+    out.fill(Qt.transparent)
+    p = QPainter(out)
+    p.setRenderHint(QPainter.Antialiasing)
+    path = QPainterPath()
+    path.addEllipse(0, 0, size, size)
+    p.setClipPath(path)
+    p.drawPixmap(0, 0, src)
+    p.end()
+    return out
 
 
 def read_json(p):
@@ -62,12 +95,14 @@ def send(sid, item):
 
 
 class ChatWindow(QWidget):
-    def __init__(self):
+    def __init__(self, theme, neutral):
         super().__init__(None, Qt.Window | Qt.WindowStaysOnTopHint)
+        self.t, self.tx = theme, theme['text']
         self.setObjectName('chat')
-        self.setWindowTitle('和 CC 聊天')
-        self.setStyleSheet(STYLE)
-        self.resize(400, 560)
+        self.setWindowTitle(self.tx['title'])
+        self.setStyleSheet(style(theme))
+        self.avatar = round_avatar(neutral, theme['avatar']) if theme.get('avatar') and not neutral.isNull() else None
+        self.resize(420, 680)
         self.sessions = []           # [(sid, cwd, state)]
         self.sid = None
         self.shown_key = None        # 上次画的内容，没变就不重画
@@ -95,6 +130,7 @@ class ChatWindow(QWidget):
         self.scroll.setWidgetResizable(True)
         self.scroll.setWidget(self.msgs)
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setMinimumHeight(220)
 
         self.ask = QFrame()
         self.ask.setObjectName('ask')
@@ -103,9 +139,9 @@ class ChatWindow(QWidget):
 
         bottom = QHBoxLayout()
         self.input = QLineEdit()
-        self.input.setPlaceholderText('发给 CC…（回车发送）')
+        self.input.setPlaceholderText(self.tx['placeholder'])
         self.input.returnPressed.connect(self.on_send)
-        self.btn = QPushButton('发送')
+        self.btn = QPushButton(self.tx['send'])
         self.btn.setObjectName('send')
         self.btn.clicked.connect(self.on_send)
         bottom.addWidget(self.input, 1)
@@ -123,8 +159,12 @@ class ChatWindow(QWidget):
         """sessions: [(sid, cwd, state)]，只含开了 /desk-pet、还有心跳的会话。"""
         self.sessions = sessions
         ids = [s[0] for s in sessions]
-        if [self.pick.itemData(i) for i in range(self.pick.count())] != ids or any(
-                self.pick.itemText(i) != self.label(s) for i, s in enumerate(sessions)):
+        if sorted(self.pick.itemData(i) for i in range(self.pick.count())) == sorted(ids):
+            for i in range(self.pick.count()):   # 会话没变：只改文字，不重建（不然打开的下拉框会被关掉）
+                s = sessions[ids.index(self.pick.itemData(i))]
+                if self.pick.itemText(i) != self.label(s):
+                    self.pick.setItemText(i, self.label(s))
+        else:
             self.pick.blockSignals(True)
             self.pick.clear()
             for s in sessions:
@@ -138,14 +178,15 @@ class ChatWindow(QWidget):
             else:
                 self.sid = None
         self.pick.setVisible(len(sessions) > 1)
-        self.setWindowTitle(f'和 CC 聊天 · {self.label(sessions[ids.index(self.sid)])}' if self.sid in ids else '和 CC 聊天')
+        title = self.tx['title']
+        self.setWindowTitle(f'{title} · {self.label(sessions[ids.index(self.sid)])}' if self.sid in ids else title)
         has = bool(sessions)
         self.input.setEnabled(has)
         self.btn.setEnabled(has)
         if not has:
-            self.input.setPlaceholderText('没有开 /desk-pet 的会话：在 CC 里输入 /desk-pet')
+            self.input.setPlaceholderText(self.tx['no_session'])
         else:
-            self.input.setPlaceholderText('发给 CC…（回车发送）')
+            self.input.setPlaceholderText(self.tx['placeholder'])
 
         # 没开窗口时：其他会话来了新回复或提问也要提醒
         for sid, _, _ in sessions:
@@ -156,7 +197,7 @@ class ChatWindow(QWidget):
             if out.get('ask'):
                 if not self.isVisible() or self.sid != sid:
                     self.sid = sid
-                    self.pick.setCurrentIndex(ids.index(sid))
+                    self.pick.setCurrentIndex(self.pick.findData(sid))
                     self.open_near()           # 有提问要选：直接弹出来
             elif last > self.seen[sid] and (not self.isVisible() or self.sid != sid):
                 self.unread = True
@@ -189,7 +230,7 @@ class ChatWindow(QWidget):
         key = json.dumps([self.sid, log, ask, pending], ensure_ascii=False)
         self.perm.setVisible(bool(perm))
         if perm:
-            self.perm.setText(f'⚠ 终端里在等你批准：{perm}（权限只能在终端里点）')
+            self.perm.setText('⚠ ' + self.tx['perm'].format(tool=perm))
         if key == self.shown_key:
             return
         self.shown_key = key
@@ -198,13 +239,14 @@ class ChatWindow(QWidget):
             if w:
                 w.deleteLater()
         if not log and not pending:
-            self.add_note('还没有消息。在下面输入发给 CC，或在终端里正常聊天，这里会同步显示。')
+            self.add_note(self.tx['empty'])
         for e in log:
             self.add_msg(e['role'], e['text'], src=e.get('src'))
         for m in pending:
             self.add_msg('user', m['text'], pending=True)
         self.draw_ask(ask)
-        QTimer.singleShot(0, lambda: self.scroll.verticalScrollBar().setValue(self.scroll.verticalScrollBar().maximum()))
+        bar = self.scroll.verticalScrollBar()       # 等布局排好再滚到底
+        QTimer.singleShot(60, lambda: bar.setValue(bar.maximum()))
 
     def add_note(self, text):
         n = QLabel(text)
@@ -218,7 +260,7 @@ class ChatWindow(QWidget):
         b.setProperty('role', role)
         b.setProperty('pending', 'true' if pending else 'false')
         b.setTextFormat(Qt.MarkdownText if role == 'cc' else Qt.PlainText)
-        b.setText(text + ('\n（发送中…）' if pending else ''))
+        b.setText(text + ('\n' + self.tx['sending'] if pending else ''))
         b.setWordWrap(True)
         b.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.LinksAccessibleByMouse)
         b.setOpenExternalLinks(True)
@@ -229,7 +271,7 @@ class ChatWindow(QWidget):
         col = QVBoxLayout()
         col.setSpacing(1)
         if role == 'user' and src == 'terminal':
-            m = QLabel('在终端里发的')
+            m = QLabel(self.tx['from_terminal'])
             m.setObjectName('meta')
             m.setAlignment(Qt.AlignRight)
             col.addWidget(m)
@@ -238,6 +280,11 @@ class ChatWindow(QWidget):
             row.addStretch(1)
             row.addLayout(col)
         else:
+            if self.avatar:                      # 她说的话：左边带头像
+                a = QLabel()
+                a.setPixmap(self.avatar)
+                a.setAlignment(Qt.AlignTop)
+                row.addWidget(a, 0, Qt.AlignTop)
             row.addLayout(col)
             row.addStretch(1)
         w = QWidget()
@@ -272,7 +319,8 @@ class ChatWindow(QWidget):
             self.ask_box.addWidget(t)
             btns = []
             for o in q.get('options', []):
-                text = o.get('label', '') + (f"\n{o['description']}" if o.get('description') else '')
+                d = o.get('description') or ''
+                text = o.get('label', '') + (f'\n{d}' if d and d.strip().lower() != o.get('label', '').strip().lower() else '')
                 if q.get('multiSelect'):
                     b = QCheckBox(text)
                     b.toggled.connect(lambda on, i=i, l=o['label']: self.toggle(i, l, on))
@@ -285,12 +333,12 @@ class ChatWindow(QWidget):
                 self.ask_box.addWidget(b)
             self.groups.append(btns)
         row = QHBoxLayout()
-        back = QPushButton('回终端答')
+        back = QPushButton(self.tx['back_to_terminal'])
         back.clicked.connect(lambda: self.answer(terminal=True))
         row.addWidget(back)
         row.addStretch(1)
         if not single:
-            self.ok = QPushButton('提交')
+            self.ok = QPushButton(self.tx['submit'])
             self.ok.setObjectName('send')
             self.ok.setEnabled(False)
             self.ok.clicked.connect(lambda: self.answer())
