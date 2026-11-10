@@ -1,0 +1,349 @@
+#!/usr/bin/env python3
+"""羊角修女桌宠（PySide6）。
+
+透明无边框置顶窗口；按 Claude Code 的状态播动画（状态由 cc-mod 写到 ~/.cache/desk-pet/sessions）；
+点她一下行提裙礼，之后视线跟着鼠标一会儿；按住拖动时按方向跑；托盘可退出。
+透明处点穿用 setMask：窗口形状 = 当前画面的不透明像素。
+"""
+import json
+import math
+import os
+import random
+import sys
+import time
+from pathlib import Path
+
+# KDE 设了 1.5 倍缩放；向下取整成 1，按物理像素一比一画，像素画不被缩放糊掉（要放大用 DESK_PET_SCALE）
+os.environ['QT_SCALE_FACTOR_ROUNDING_POLICY'] = 'Floor'
+
+from PySide6.QtCore import QPoint, QRect, Qt, QTimer
+from PySide6.QtGui import (QAction, QBitmap, QColor, QCursor, QFont, QGuiApplication, QIcon, QImage,
+                           QPainter, QPixmap, QRegion, QTransform)
+from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon, QWidget
+
+ROOT = Path(__file__).resolve().parent
+ASSETS = Path(os.environ.get('DESK_PET_ASSETS') or ROOT / 'assets')
+SESSIONS = Path.home() / '.cache/desk-pet/sessions'
+K = max(1, int(os.environ.get('DESK_PET_SCALE') or 1))     # 整数放大倍数
+DEBUG = bool(os.environ.get('DESK_PET_DEBUG'))
+
+W, H = 192, 208                 # 单帧大小
+WIN_W, WIN_H = 200, 240         # 窗口（未放大）；帧画在 (LEFT, TOP)，上面留给气泡
+LEFT, TOP = 4, 32
+
+# CC 状态 → 素材状态 id（缺素材时退回 idle / 默认姿态）
+ANIM = {'working': 'running', 'reading': 'review', 'waiting': 'waiting', 'done': 'waving', 'error': 'failed', 'idle': 'idle'}
+LABEL = {'working': '工作中', 'reading': '查看中', 'waiting': '等你回复', 'done': '完成啦', 'error': '出错了', 'idle': ''}
+PRIORITY = ['waiting', 'error', 'working', 'reading', 'done', 'idle']
+INTRO = {'done': 'jumping', 'waiting': 'startled-avert'}   # 切进某个状态时先播一遍的小动作
+RANDOM = ['prayer-peek', 'sneeze', 'brave-gaze']           # 空闲时偶尔播；循环类播 4 秒
+if DEBUG:
+    SIT_MS, SLEEP_MS, RANDOM_MS, BORED_MS = 8e3, 16e3, (3e3, 4e3), 8e3
+else:
+    SIT_MS, SLEEP_MS, RANDOM_MS, BORED_MS = 120e3, 300e3, (20e3, 40e3), 60e3
+CLICK_CURTSY_MS, CLICK_GAZE_MS = 3000, 8000
+
+T0 = time.monotonic()
+
+
+def now_ms():
+    return (time.monotonic() - T0) * 1000
+
+
+def log(msg):
+    if DEBUG:
+        print(f'[pet] {now_ms() / 1000:.1f}s {msg}', file=sys.stderr, flush=True)
+
+
+def load_json(name):
+    try:
+        return json.loads((ASSETS / name).read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return {}
+
+
+def load_clip(meta):
+    """读一个状态的 enter / sustain / exit 帧；缺任何一帧就当这个状态不存在。"""
+    phases = {}
+    for name, ph in meta.get('phases', {}).items():
+        frames = [(QImage(str(ASSETS / ph['path'] / f'{i:02d}.png')), ms) for i, ms in enumerate(ph['durations_ms'])]
+        if not frames or any(img.isNull() for img, _ in frames):
+            return None
+        phases[name] = frames
+    return {'mode': meta.get('mode', 'loop'), 'phases': phases} if len(phases) == 3 else None
+
+
+def cc_state():
+    """汇总所有 CC 会话：等你回复 > 出错 > 工作中 > 查看中 > 完成 > 空闲。
+    3 分钟没心跳的不算；ended 和 1 天前的文件顺手删掉；完成/出错超过 2 分钟算空闲。"""
+    counts, praised, now = {}, 0, time.time()
+    for p in SESSIONS.glob('*.json'):
+        try:
+            age = now - p.stat().st_mtime
+            v = json.loads(p.read_text())
+        except (OSError, ValueError):
+            continue
+        st = v.get('state', '')
+        if st == 'ended' or age > 86400:
+            p.unlink(missing_ok=True)
+            continue
+        if age > 180:
+            continue
+        praised = max(praised, v.get('praised') or 0)
+        if st in ('done', 'error') and age > 120:
+            st = 'idle'
+        counts[st] = counts.get(st, 0) + 1
+    return next((s for s in PRIORITY if s in counts), 'idle'), counts, praised
+
+
+class Pet(QWidget):
+    def __init__(self):
+        super().__init__(None, Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setFixedSize(WIN_W * K, WIN_H * K)
+        self.canvas = QImage(self.size(), QImage.Format_ARGB32_Premultiplied)
+
+        # 素材
+        self.neutral = QImage(str(ASSETS / 'neutral-N.png'))
+        self.clips = {}
+        for s in load_json('状态参数.json').get('states', []) + load_json('extra-states.json').get('states', []):
+            if (c := load_clip(s)):
+                self.clips[s['id']] = c
+        for v in load_json('gaze/gaze.json').get('variants', []):
+            if (c := load_clip(v)):
+                self.clips[f"gaze:{v['angle_degrees']:g}"] = c
+        log(f"loaded {[k for k in self.clips if not k.startswith('gaze:')]} | "
+            f"{sum(k.startswith('gaze:') for k in self.clips)} 个视线方向")
+
+        # 目标
+        self.cc, self.bubble = 'idle', ''
+        self.gaze, self.gaze_until = None, 0     # 点击后的一小段时间里视线跟着鼠标
+        self.temp = None                         # 临时动作 {key, until, urgent, random}
+        self.drag, self.drag_until = None, 0     # 拖动时左右跑
+        self.idle_since = self.waiting_since = now_ms()
+        self.next_random = now_ms() + RANDOM_MS[0]
+        self.praised = None
+        # 播放
+        self.cur, self.phase, self.idx, self.flip, self.until = None, 'sustain', 0, False, 0
+        self.frame = self.neutral
+        # 鼠标
+        self.press = None
+
+        g = QGuiApplication.primaryScreen().availableGeometry()
+        self.move(g.right() - 60 - self.width(), g.bottom() - 40 - self.height())
+        self.render()
+
+        for ms, fn in ((15, self.step), (40, self.track_cursor), (1000, self.poll)):
+            t = QTimer(self)
+            t.timeout.connect(fn)
+            t.start(ms)
+        self.poll()
+
+    # ---- 选目标 ----
+    def target(self, now):
+        if self.drag and now < self.drag_until and self.drag in self.clips:
+            return {'key': self.drag, 'urgent': True}
+        t = self.temp
+        if t and not (t.get('until') and t['until'] < now) and t['key'] in self.clips:
+            return {'key': t['key'], 'urgent': t.get('urgent', False)}
+        self.temp = None
+        if self.gaze and now < self.gaze_until:
+            return self.gaze
+        if self.cc == 'idle':
+            idle_for = now - self.idle_since
+            if idle_for > SLEEP_MS and 'sleepy-nod' in self.clips:
+                return {'key': 'sleepy-nod'}
+            if idle_for > SIT_MS and 'sit-swing' in self.clips:
+                return {'key': 'sit-swing'}
+            if now > self.next_random:           # 站着发呆时偶尔做个小动作
+                self.next_random = now + random.uniform(*RANDOM_MS)
+                pool = [k for k in RANDOM if k in self.clips]
+                if pool:
+                    k = random.choice(pool)
+                    self.temp = {'key': k, 'random': True,
+                                 'until': None if self.clips[k]['mode'] == 'oneshot' else now + 4000}
+                    return {'key': k}
+        k = ANIM[self.cc]
+        if self.cc == 'waiting' and now - self.waiting_since > BORED_MS and 'bored-wait' in self.clips:
+            k = 'bored-wait'                     # 等你回复太久没人理
+        if k in self.clips:
+            return {'key': k}
+        return {'key': 'idle'} if 'idle' in self.clips else None
+
+    def gaze_clip(self, a):
+        """视线角度 → 可用素材：本身 > 镜像 > 最近的可用角度。"""
+        key = lambda x: f'gaze:{x % 360:g}'
+        if key(a) in self.clips:
+            return {'key': key(a)}
+        if key(360 - a) in self.clips:
+            return {'key': key(360 - a), 'flip': True}
+        best = min((k for k in self.clips if k.startswith('gaze:')),
+                   key=lambda k: abs((float(k[5:]) - a + 540) % 360 - 180), default=None)
+        return {'key': best} if best else None
+
+    # ---- 播放：enter → sustain(循环) → exit ----
+    def start(self, t):
+        self.cur, self.flip, self.phase, self.idx = t['key'], t.get('flip', False), 'enter', 0
+        log(f"play {self.cur}{' (镜像)' if self.flip else ''}")
+
+    def step(self):
+        now = now_ms()
+        t = self.target(now)
+        same = bool(t) and self.cur == t['key'] and self.flip == t.get('flip', False)
+        if not self.cur:
+            if t:
+                self.start(t)
+        else:
+            # 视线换方向：直接跳到新方向的保持帧，不回站立
+            if not same and t and self.cur.startswith('gaze:') and t['key'].startswith('gaze:'):
+                self.cur, self.flip, self.phase, self.idx, self.until = t['key'], t.get('flip', False), 'sustain', 0, 0
+                same = True
+            c = self.clips[self.cur]
+            frames = c['phases'][self.phase]
+            # 视线保持帧、拖动/点击可以马上打断；其他循环播完这一圈再退出
+            if not same and self.phase == 'sustain' and (c['mode'] in ('hold', 'parameterized_hold') or (t and t.get('urgent'))):
+                self.phase, self.idx = 'exit', 0
+            elif now >= self.until:
+                self.idx += 1
+                if self.idx >= len(frames):
+                    self.idx = 0
+                    if self.phase == 'enter':
+                        self.phase = 'sustain'
+                    elif self.phase == 'sustain':
+                        if c['mode'] == 'oneshot':
+                            self.phase = 'exit'
+                            if self.temp and self.temp['key'] == self.cur:
+                                self.temp = None
+                        elif not same:
+                            self.phase = 'exit'
+                        elif c['mode'] == 'hold':
+                            self.idx = len(frames) - 1
+                    else:
+                        self.cur = None
+                        if t:
+                            self.start(t)
+            else:
+                return
+        if self.cur:
+            fs = self.clips[self.cur]['phases'][self.phase]
+            self.frame, ms = fs[min(self.idx, len(fs) - 1)]
+        else:
+            self.frame, ms = self.neutral, 200
+        self.until = now + ms
+        self.render()
+
+    # ---- 画面 + 点穿形状 ----
+    def render(self):
+        self.canvas.fill(Qt.transparent)
+        p = QPainter(self.canvas)
+        p.scale(K, K)
+        p.translate(LEFT, TOP)
+        if self.flip:
+            p.setTransform(QTransform(-1, 0, 0, 1, W, 0), True)
+        p.drawImage(0, 0, self.frame)
+        p.resetTransform()
+        if self.bubble:
+            p.scale(K, K)
+            p.setRenderHint(QPainter.Antialiasing)
+            p.setPen(QColor(0, 0, 0, 50))
+            p.setBrush(QColor('#fff'))
+            p.drawRoundedRect(8, 4, 184, 22, 11, 11)
+            f = QFont()
+            f.setPixelSize(12)
+            p.setFont(f)
+            p.setPen(QColor('#333'))
+            p.drawText(QRect(8, 4, 184, 22), Qt.AlignCenter, self.bubble)
+        p.end()
+        self.setMask(QRegion(QBitmap.fromImage(self.canvas.createAlphaMask())))
+        self.update()
+
+    def paintEvent(self, _):
+        p = QPainter(self)
+        p.setCompositionMode(QPainter.CompositionMode_Source)
+        p.drawImage(0, 0, self.canvas)
+
+    # ---- 鼠标 ----
+    def track_cursor(self):
+        """视线方向（只在点击后的一小段时间里用）；鼠标在她身上时不转头。"""
+        rel = QCursor.pos() - self.pos()
+        dx, dy = rel.x() / K - LEFT - 96, rel.y() / K - TOP - 80
+        if math.hypot(dx, dy) > 70:
+            a = (math.degrees(math.atan2(dx, -dy)) + 360) % 360
+            self.gaze = self.gaze_clip(round(a / 22.5) * 22.5 % 360)
+        else:
+            self.gaze = None
+
+    def mousePressEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            g = e.globalPosition().toPoint()
+            self.press, self.press_win, self.dragging, self.drag_x = g, self.pos(), False, g.x()
+
+    def mouseMoveEvent(self, e):
+        if self.press is None:
+            return
+        g = e.globalPosition().toPoint()
+        if not self.dragging and (g - self.press).manhattanLength() > 4:
+            self.dragging = True
+        if self.dragging:                        # 按住移动超过几像素算拖动，按方向跑
+            self.move(self.press_win + (g - self.press))
+            if abs(g.x() - self.drag_x) > 2:
+                self.drag = 'running-right' if g.x() > self.drag_x else 'running-left'
+                self.drag_until, self.drag_x = now_ms() + 400, g.x()
+
+    def mouseReleaseEvent(self, e):
+        if self.press is not None and not self.dragging:   # 没移动就松开算点击：行提裙礼，之后看鼠标
+            now = now_ms()
+            self.temp = {'key': 'modest-curtsy', 'until': now + CLICK_CURTSY_MS, 'urgent': True}
+            self.gaze_until = now + CLICK_CURTSY_MS + CLICK_GAZE_MS
+            log('点击')
+        self.press = None
+
+    # ---- CC 状态 ----
+    def poll(self):
+        state, counts, praised = cc_state()
+        now = now_ms()
+        if state != self.cc:
+            log(f'cc {self.cc} -> {state}')
+            if INTRO.get(state) in self.clips:
+                self.temp = {'key': INTRO[state]}
+            if state == 'idle':
+                self.idle_since = now
+            if state == 'waiting':
+                self.waiting_since = now
+        self.cc = state
+        if self.praised is not None and praised > self.praised:   # 被夸了：藏脸
+            self.temp = {'key': 'hidden-blush', 'until': now + 4500}
+            log('被夸')
+        self.praised = praised
+        # 气泡：最要紧的状态（多个就 ×N），其他会话在忙的话补上，例如「等你回复 +2 工作中」
+        n = counts.get(state, 0)
+        others = ''.join(f' +{v} {LABEL.get(k, k)}' for k, v in counts.items() if k not in (state, 'idle') and v > 0)
+        text = LABEL[state] + (f' ×{n}' if n > 1 else '') + others if LABEL[state] else ''
+        if text != self.bubble:
+            self.bubble = text
+            self.render()
+
+
+def main():
+    app = QApplication(sys.argv)
+    app.setApplicationName('desk-pet')
+    app.setQuitOnLastWindowClosed(False)
+    pet = Pet()
+    pet.show()
+
+    tray = QSystemTrayIcon(QIcon(QPixmap.fromImage(pet.neutral)), app)
+    tray.setToolTip('羊角修女')
+    menu = QMenu()
+    toggle = QAction('显示 / 隐藏', menu)
+    toggle.triggered.connect(lambda: pet.setVisible(not pet.isVisible()))
+    quit_ = QAction('退出', menu)
+    quit_.triggered.connect(app.quit)
+    menu.addAction(toggle)
+    menu.addAction(quit_)
+    tray.setContextMenu(menu)
+    tray.show()
+    sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    main()

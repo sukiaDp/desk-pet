@@ -1,16 +1,17 @@
 # desk-pet
 
-羊角修女桌宠（Tauri v2）。透明置顶、透明处点穿、可拖动。按 Claude Code 的状态切换动画，头顶气泡显示状态；点她一下会行提裙礼，然后看着鼠标一会儿。
+羊角修女桌宠（PySide6，单文件 `pet.py`）。透明置顶、透明处点穿、可拖动。按 Claude Code 的状态切换动画，头顶气泡显示状态；点她一下会行提裙礼，然后看着鼠标一会儿。
 
+- 首次准备：`./setup.sh`（在 `/mnt/data2/desk-pet-build/venv` 建 Python 3.12 venv 装 PySide6；3.10 上 PySide6 会崩）
 - 启动：`./desk-pet.sh`；退出：托盘图标 →「退出」（也可以在那里显示 / 隐藏）
-- 构建：`./build.sh`（Rust 工具链、编译产物都在 `/mnt/data2/desk-pet-build`）
 - 放大：`DESK_PET_SCALE=2 ./desk-pet.sh`（整数倍）
-- 素材：`assets/` 是 1–6 号完整状态包解压后的原样内容，运行时直接读，不用重新编译。提裙礼、被夸后藏脸、无聊等待三个附加包整理成 `assets/states/<id>/` 并列在 `assets/extra-states.json`。原始 zip 在 `source-zips/`（不进 git）。
+- 素材：`assets/` 是 1–6 号完整状态包解压后的原样内容，运行时直接读。提裙礼、被夸后藏脸、无聊等待三个附加包整理成 `assets/states/<id>/` 并列在 `assets/extra-states.json`。原始 zip 在 `source-zips/`（不进 git）。
+- 以前的 Tauri v2 版本在 `tauri` 分支（Linux 上 WebKitGTK 透明窗口拖动后有重影，所以换了 Qt）。
 
 ## 和 CC 联动
 
 `cc-mod/` 是一个 CC mod（已装在用户级：`desk-pet@local-mods`）。每个会话把状态写到
-`~/.cache/desk-pet/sessions/<会话id>.json`，每 60 秒写一次心跳。桌宠每秒汇总一次，优先级：等你回复 > 出错 > 工作中 > 完成 > 空闲。
+`~/.cache/desk-pet/sessions/<会话id>.json`，每 60 秒写一次心跳。桌宠每秒读一次、汇总，优先级：等你回复 > 出错 > 工作中 > 查看中 > 完成 > 空闲。
 3 分钟没有心跳的会话不计入；完成、出错超过 2 分钟算空闲。
 
 | 情况 | 动画 |
