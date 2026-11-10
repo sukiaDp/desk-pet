@@ -391,11 +391,6 @@ class ChatWindow(QWidget):
         row.setContentsMargins(0, 0, 0, 0)
         col = QVBoxLayout()
         col.setSpacing(1)
-        if role == 'user' and src == 'terminal':
-            m = QLabel(self.tx['from_terminal'])
-            m.setObjectName('meta')
-            m.setAlignment(Qt.AlignRight)
-            col.addWidget(m)
         col.addWidget(b)
         if role == 'user':
             row.addStretch(1)
