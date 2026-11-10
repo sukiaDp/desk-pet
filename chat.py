@@ -79,6 +79,8 @@ QPushButton#clip:hover {{ background: {rgba(c['gold'], 0.18)}; border-radius: 6p
 QLabel#thumb {{ border: 1px solid {c['gold']}; border-radius: 3px; }}
 QWidget#chat QLabel#filechip {{ border: 1px solid {c['gold']}; border-radius: 3px; padding: 4px 22px 4px 8px; font-size: 12px; }}
 QPushButton#unthumb {{ color: #fff; background: rgba(0,0,0,0.55); border: none; border-radius: 3px; padding: 0; font-size: 11px; }}
+QPushButton#tobottom {{ color: {c['rubric']}; background: {rgba(c['page'], 0.95)}; border: 1px solid {c['gold']}; border-radius: 16px; padding: 0 8px; font-size: 14px; }}
+QPushButton#tobottom:hover {{ background: {c['page']}; border-color: {c['rubric']}; }}
 QPushButton#close {{ color: {c['muted']}; background: transparent; border: none; padding: 0; font-size: 15px; }}
 QPushButton#close:hover {{ color: {c['rubric']}; }}
 """
@@ -124,6 +126,7 @@ QLineEdit {{ color: {c['ink']}; padding: 7px 11px; border: 1px solid {c['border'
 QLineEdit:focus {{ border-color: {c['gold']}; }}
 QPushButton#send {{ padding: 6px 16px; border-radius: 15px; background: {c['accent']}; color: {c['accent_ink']}; border: 1px solid {c['gold']}; }}
 QPushButton#send:disabled {{ background: {c['border']}; color: {c['muted']}; border-color: {c['border']}; }}
+QPushButton#tobottom {{ color: {c['accent']}; background: {c['panel']}; border: 1px solid {c['border']}; border-radius: 16px; padding: 0 8px; font-size: 14px; }}
 QPushButton#clip {{ background: transparent; border: none; padding: 0; }}
 QPushButton#clip:hover {{ background: {rgba(c['gold'], 0.18)}; border-radius: 6px; }}
 QLabel#thumb {{ border: 1px solid {c['gold']}; border-radius: 3px; }}
@@ -285,6 +288,13 @@ class ChatWindow(QWidget):
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll.setMinimumHeight(220)
         self.scroll.verticalScrollBar().valueChanged.connect(self.on_scroll)
+        self.scroll.verticalScrollBar().rangeChanged.connect(lambda *_: self.update_down())
+        self.down = QPushButton('↓', self.scroll)   # 不在最底下时：右下角一个「回到底部」
+        self.down.setObjectName('tobottom')
+        self.down.setCursor(Qt.PointingHandCursor)
+        self.down.clicked.connect(self.to_bottom)
+        self.down.hide()
+        self.new_below, self.force_bottom = False, False
         self.act = QLabel()                      # 页尾一行：CC 正在做什么
         self.act.setObjectName('activity')
         self.act.hide()
@@ -363,6 +373,7 @@ class ChatWindow(QWidget):
         self.clip.setIconSize(QSize(round(22 * k), round(22 * k)))
         self.draw_tray()
         self.resize(w, h)
+        QTimer.singleShot(0, self.update_down)
         self.shown_key = None                    # 头像、气泡宽度都变了：重画对话
         self.refresh()
         self.update()
@@ -457,7 +468,11 @@ class ChatWindow(QWidget):
             self.perm.setText('⚠ ' + self.tx['perm'].format(tool=perm))
         if key == self.shown_key:
             return
+        fresh = self.shown_key is None or self.force_bottom   # 刚打开 / 换会话 / 自己发了消息：一律到底
         self.shown_key = key
+        bar = self.scroll.verticalScrollBar()
+        was_bottom = fresh or self.at_bottom()
+        old_val = bar.value()
         while self.list.count() > 1:
             w = self.list.takeAt(1).widget()
             if w and w not in (self.ask, self.act):   # 提问区、进度行留着，重新排到最后
@@ -476,9 +491,19 @@ class ChatWindow(QWidget):
         self.list.addWidget(self.act)            # 进度一行、提问区接在对话后面，跟着一起滚动
         self.list.addWidget(self.ask)
         self.draw_ask(ask)
-        bar = self.scroll.verticalScrollBar()       # 等布局排好再滚：平时滚到底；加载更早的记录时停在原处
-        keep, self.keep_from_bottom = self.keep_from_bottom, None
-        QTimer.singleShot(60, lambda: bar.setValue(bar.maximum() - keep if keep is not None else bar.maximum()))
+        # 等布局排好再滚：本来在底下就跟着到底；往上翻着看就停在原处，右下角提示有新消息；加载更早的记录时保持离底部的距离
+        keep, self.keep_from_bottom, self.force_bottom = self.keep_from_bottom, None, False
+        if keep is None and not was_bottom:
+            self.new_below = True
+        def settle():
+            if keep is not None:
+                bar.setValue(bar.maximum() - keep)
+            elif was_bottom:
+                bar.setValue(bar.maximum())
+            else:
+                bar.setValue(old_val)
+            self.update_down()
+        QTimer.singleShot(60, settle)
 
     # ---- 聊天记录：桌宠自己存一份全量的，mod 那边只留最近 40 条 ----
     def archive(self, sid, log):
@@ -502,7 +527,31 @@ class ChatWindow(QWidget):
             except OSError:
                 pass
 
+    def at_bottom(self):
+        bar = self.scroll.verticalScrollBar()
+        return bar.value() >= bar.maximum() - round(6 * self.k)
+
+    def to_bottom(self):
+        bar = self.scroll.verticalScrollBar()
+        bar.setValue(bar.maximum())
+
+    def update_down(self):
+        """右下角的「回到底部」：不在最底下才显示；翻着看时来了新消息就写上「新消息」。"""
+        if self.at_bottom():
+            self.new_below = False
+            self.down.hide()
+            return
+        self.down.setText('↓ ' + self.tx['new_below'] if self.new_below else '↓')
+        h = round(32 * self.k)
+        self.down.setFixedHeight(h)
+        self.down.setFixedWidth(max(h, self.down.sizeHint().width() + round(14 * self.k)) if self.new_below else h)
+        vp = self.scroll.viewport().geometry()
+        self.down.move(vp.right() - self.down.width() - round(10 * self.k), vp.bottom() - h - round(8 * self.k))
+        self.down.show()
+        self.down.raise_()
+
     def on_scroll(self, v):
+        self.update_down()
         # 滚到顶：再加载一页更早的记录
         if v == 0 and self.more and self.keep_from_bottom is None:
             self.keep_from_bottom = self.scroll.verticalScrollBar().maximum()
@@ -719,6 +768,7 @@ class ChatWindow(QWidget):
             item['prompt'] = '\n\n'.join(([text] if text else []) + notes)
             self.draw_tray()
         send(self.sid, item)
+        self.force_bottom = True                 # 自己发的：回到底部看
         self.input.clear()
         self.refresh()
 
