@@ -2,13 +2,17 @@
   "name": "羊角修女",
   "assets": "assets",
   "font": "Noto Serif CJK SC",
-  "avatar": [68, 2, 56],
+  "avatar": [
+    68,
+    2,
+    56
+  ],
   "colors": {
     "bg": "#efe5d3",
     "panel": "#faf4e8",
-    "ink": "#2b1d17",
-    "muted": "#8c7765",
-    "border": "#d6c3a3",
+    "ink": "#2a1a10",
+    "muted": "#8a7358",
+    "border": "#b89b70",
     "accent": "#3a2820",
     "accent_ink": "#f6dfae",
     "gold": "#c8955a",
@@ -20,11 +24,17 @@
     "warn_ink": "#5a3d12",
     "bubble_bg": "#faf2e2",
     "bubble_ink": "#3a2820",
-    "bubble_border": "#c8955a"
+    "bubble_border": "#c8955a",
+    "leather": "#5a3220",
+    "leather_dark": "#2a140b",
+    "page": "#f4e8cb",
+    "page_shade": "#dcc596",
+    "page_edge": "#c9a35a",
+    "rubric": "#9b2b20"
   },
   "text": {
-    "title": "告解室",
-    "placeholder": "向修女说点什么…（回车发送）",
+    "title": "",
+    "placeholder": "在这里写下想说的话…（回车呈上）",
     "empty": "这里还很安静。在下面写下想对 CC 说的话，或者照常在终端里聊，这里会同步。",
     "send": "送出",
     "submit": "就这样",
@@ -33,6 +43,8 @@
     "sending": "（正在传达…）",
     "perm": "终端里在等你批准：{tool}（权限只能在终端里点）",
     "new_reply": "有回信啦，点我看",
-    "no_session": "没有开 /desk-pet 的会话：在 CC 里输入 /desk-pet"
-  }
+    "no_session": "没有开 /desk-pet 的会话：在 CC 里输入 /desk-pet",
+    "seal": "呈上"
+  },
+  "look": "book"
 }

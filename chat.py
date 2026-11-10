@@ -10,16 +10,67 @@ import os
 import time
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QFont, QGuiApplication, QPainter, QPainterPath, QPixmap
+from PySide6.QtCore import QRectF, Qt, QTimer
+from PySide6.QtGui import QColor, QFont, QGuiApplication, QPainter, QPainterPath, QPixmap
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel, QLineEdit, QPushButton,
                                QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
+
+import book
 
 CHAT = Path.home() / '.cache/desk-pet/chat'
 STATE_LABEL = {'working': '工作中', 'reading': '查看中', 'waiting': '等你回复', 'done': '完成啦', 'error': '出错了', 'idle': '空闲'}
 
+def rgba(hex_, a):
+    q = QColor(hex_)
+    return f'rgba({q.red()},{q.green()},{q.blue()},{a})'
+
+
+def book_style(t):
+    """书页外观：没有气泡，正文像印在纸上；你的话是朱红斜体，像经书里的红字批注。"""
+    c = t['colors']
+    font = f"QWidget#chat, QWidget#chat * {{ font-family: '{t['font']}'; }}" if t['font'] else ''
+    return font + f"""
+QWidget#chat {{ background: transparent; color: {c['ink']}; }}
+QWidget#chat QLabel, QWidget#chat QCheckBox {{ color: {c['ink']}; background: transparent; }}
+QScrollArea, QWidget#msgs {{ background: transparent; border: none; }}
+QScrollBar:vertical {{ background: transparent; width: 6px; }}
+QScrollBar::handle:vertical {{ background: {rgba(c['gold'], 0.55)}; border-radius: 3px; min-height: 30px; }}
+QScrollBar::add-line, QScrollBar::sub-line {{ height: 0; }}
+QScrollBar::add-page, QScrollBar::sub-page {{ background: transparent; }}
+QWidget#chat QLabel[role="user"] {{ color: {c['rubric']}; font-style: italic; font-size: 14px; padding: 2px 2px; }}
+QWidget#chat QLabel[role="cc"] {{ color: {c['ink']}; font-size: 14px; padding: 4px 2px; }}
+QWidget#chat QLabel[role="user"][pending="true"] {{ color: {c['muted']}; }}
+QWidget#chat QLabel#meta {{ color: {c['muted']}; font-size: 11px; font-style: italic; }}
+QWidget#chat QLabel#optdesc {{ color: {c['muted']}; font-size: 12px; }}
+QWidget#chat QLabel#sep {{ color: {c['gold']}; font-size: 12px; }}
+QWidget#chat QLabel#perm {{ color: {c['rubric']}; background: {rgba(c['rubric'], 0.08)}; border-left: 3px solid {c['rubric']}; padding: 4px 8px; font-style: italic; }}
+QFrame#ask {{ background: {rgba('#fffaf0', 0.45)}; border: none; border-top: 1px solid {c['gold']}; border-bottom: 1px solid {c['gold']}; }}
+QFrame#ask QLabel {{ background: transparent; font-size: 14px; }}
+QPushButton {{ color: {c['ink']}; background: transparent; border: 1px solid {c['border']}; border-radius: 3px; padding: 4px 12px; }}
+QPushButton:hover {{ border-color: {c['gold']}; }}
+QPushButton[opt="true"] {{ text-align: left; border: none; padding: 5px 8px; font-size: 14px; }}
+QPushButton[opt="true"]:hover {{ background: {rgba(c['gold'], 0.18)}; }}
+QPushButton[opt="true"]:checked {{ color: {c['rubric']}; background: {rgba(c['gold'], 0.3)}; font-weight: bold; }}
+QCheckBox {{ spacing: 8px; padding: 4px 8px; font-size: 14px; }}
+QCheckBox::indicator {{ width: 13px; height: 13px; border: 1px solid {c['gold']}; border-radius: 2px; background: {rgba('#fffaf0', 0.7)}; }}
+QCheckBox::indicator:checked {{ background: {c['rubric']}; border-color: {c['gold']}; }}
+QComboBox {{ color: {c['ink']}; background: transparent; border: none; border-bottom: 1px solid {c['border']}; padding: 2px 4px; font-style: italic; }}
+QComboBox QAbstractItemView {{ color: {c['ink']}; background: {c['page']}; selection-background-color: {c['gold']}; }}
+QLineEdit {{ color: {c['ink']}; background: transparent; border: none; border-bottom: 1px solid {c['border']}; padding: 6px 2px; font-size: 14px; }}
+QLineEdit:focus {{ border-bottom: 1px solid {c['gold']}; }}
+QPushButton#send {{ min-width: 36px; min-height: 36px; max-height: 36px; padding: 0 10px; border-radius: 18px; color: {c['accent_ink']};
+  background: qradialgradient(cx:0.4, cy:0.35, radius:0.8, stop:0 {QColor(c['rubric']).lighter(135).name()}, stop:1 {QColor(c['rubric']).darker(140).name()});
+  border: 2px solid {QColor(c['rubric']).darker(160).name()}; }}
+QPushButton#send:disabled {{ background: {c['border']}; color: {c['muted']}; border-color: {c['border']}; }}
+QPushButton#close {{ color: {c['muted']}; background: transparent; border: none; padding: 0; font-size: 15px; }}
+QPushButton#close:hover {{ color: {c['rubric']}; }}
+"""
+
+
 def style(t):
     """按主题配色生成样式表；每个控件都写明颜色，不吃系统深色主题。"""
+    if t.get('look') == 'book':
+        return book_style(t)
     c = t['colors']
     font = f"QWidget#chat, QWidget#chat * {{ font-family: '{t['font']}'; }}" if t['font'] else ''
     return font + f"""
@@ -33,6 +84,7 @@ QWidget#chat QLabel[role="user"] {{ background: {c['user_bg']}; color: {c['user_
 QWidget#chat QLabel[role="cc"] {{ background: {c['pet_bg']}; color: {c['pet_ink']}; border: 1px solid {c['border']}; border-radius: 12px; padding: 7px 10px; }}
 QWidget#chat QLabel[role="user"][pending="true"] {{ color: {c['muted']}; }}
 QWidget#chat QLabel#meta {{ color: {c['muted']}; font-size: 11px; }}
+QWidget#chat QLabel#optdesc {{ color: {c['muted']}; font-size: 12px; }}
 QWidget#chat QLabel#perm {{ background: {c['warn_bg']}; color: {c['warn_ink']}; border-radius: 8px; padding: 6px 9px; }}
 QFrame#ask {{ background: {c['panel']}; border: 1px solid {c['gold']}; border-radius: 12px; }}
 QFrame#ask QLabel {{ background: transparent; }}
@@ -96,13 +148,24 @@ def send(sid, item):
 
 class ChatWindow(QWidget):
     def __init__(self, theme, neutral):
-        super().__init__(None, Qt.Window | Qt.WindowStaysOnTopHint)
+        self.book = theme.get('look') == 'book'
+        flags = Qt.Window | Qt.WindowStaysOnTopHint | (Qt.FramelessWindowHint if self.book else Qt.Widget)
+        super().__init__(None, flags)
         self.t, self.tx = theme, theme['text']
         self.setObjectName('chat')
-        self.setWindowTitle(self.tx['title'])
+        self.setWindowTitle(self.tx['title'] or theme['name'])
         self.setStyleSheet(style(theme))
         self.avatar = round_avatar(neutral, theme['avatar']) if theme.get('avatar') and not neutral.isNull() else None
-        self.resize(420, 680)
+        if self.book:
+            self.setAttribute(Qt.WA_TranslucentBackground)
+            if self.avatar:
+                self.avatar = book.ring_avatar(self.avatar, theme['colors']['gold'])
+            self.cover, self.drag_from, self.subtitle = None, None, ''
+            self.close_btn = QPushButton('✕', self)
+            self.close_btn.setObjectName('close')
+            self.close_btn.setCursor(Qt.PointingHandCursor)
+            self.close_btn.clicked.connect(self.hide)
+        self.resize(440, 700) if self.book else self.resize(420, 680)
         self.sessions = []           # [(sid, cwd, state)]
         self.sid = None
         self.shown_key = None        # 上次画的内容，没变就不重画
@@ -148,10 +211,13 @@ class ChatWindow(QWidget):
         bottom.addWidget(self.btn)
 
         lay = QVBoxLayout(self)
+        if self.book:                            # 内容放在纸页里，顶上留给标题
+            b = book.BORDER
+            lay.setContentsMargins(b + 16, b + book.header(bool(self.tx['title'])), b + 5 + 16, b + 5 + 12)
+            self.btn.setText(self.tx.get('seal', self.tx['send']))
         lay.addLayout(top)
         lay.addWidget(self.perm)
         lay.addWidget(self.scroll, 1)
-        lay.addWidget(self.ask)
         lay.addLayout(bottom)
 
     # ---- 桌宠每秒调一次 ----
@@ -178,8 +244,13 @@ class ChatWindow(QWidget):
             else:
                 self.sid = None
         self.pick.setVisible(len(sessions) > 1)
-        title = self.tx['title']
+        title = self.tx['title'] or self.t['name']
         self.setWindowTitle(f'{title} · {self.label(sessions[ids.index(self.sid)])}' if self.sid in ids else title)
+        if self.book:
+            sub = '' if len(sessions) > 1 else (self.label(sessions[ids.index(self.sid)]) if self.sid in ids else '')
+            if sub != self.subtitle:
+                self.subtitle = sub
+                self.update()
         has = bool(sessions)
         self.input.setEnabled(has)
         self.btn.setEnabled(has)
@@ -236,14 +307,19 @@ class ChatWindow(QWidget):
         self.shown_key = key
         while self.list.count() > 1:
             w = self.list.takeAt(1).widget()
-            if w:
+            if w and w is not self.ask:          # 提问区留着，重新排到最后
                 w.deleteLater()
         if not log and not pending:
             self.add_note(self.tx['empty'])
-        for e in log:
-            self.add_msg(e['role'], e['text'], src=e.get('src'))
-        for m in pending:
-            self.add_msg('user', m['text'], pending=True)
+        items = [(e['role'], e['text'], e.get('src'), False) for e in log] + [('user', m['text'], None, True) for m in pending]
+        for i, (role, text, src, pend) in enumerate(items):
+            if self.book and role == 'user' and i > 0:   # 每段问答之间一个小花饰
+                sep = QLabel('·  ✠  ·')
+                sep.setObjectName('sep')
+                sep.setAlignment(Qt.AlignCenter)
+                self.list.addWidget(sep)
+            self.add_msg(role, text, src=src, pending=pend)
+        self.list.addWidget(self.ask)            # 提问接在对话后面，跟着一起滚动
         self.draw_ask(ask)
         bar = self.scroll.verticalScrollBar()       # 等布局排好再滚到底
         QTimer.singleShot(60, lambda: bar.setValue(bar.maximum()))
@@ -264,7 +340,9 @@ class ChatWindow(QWidget):
         b.setWordWrap(True)
         b.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.LinksAccessibleByMouse)
         b.setOpenExternalLinks(True)
-        b.setMaximumWidth(int(self.width() * 0.8))
+        b.setMaximumWidth(int(self.width() * (0.86 if self.book else 0.8)))
+        if self.book and role == 'user':
+            b.setAlignment(Qt.AlignRight)
         b.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
         row = QHBoxLayout()
         row.setContentsMargins(0, 0, 0, 0)
@@ -320,7 +398,7 @@ class ChatWindow(QWidget):
             btns = []
             for o in q.get('options', []):
                 d = o.get('description') or ''
-                text = o.get('label', '') + (f'\n{d}' if d and d.strip().lower() != o.get('label', '').strip().lower() else '')
+                text = ('❧  ' if self.book and not q.get('multiSelect') else '') + o.get('label', '')
                 if q.get('multiSelect'):
                     b = QCheckBox(text)
                     b.toggled.connect(lambda on, i=i, l=o['label']: self.toggle(i, l, on))
@@ -328,9 +406,16 @@ class ChatWindow(QWidget):
                     b = QPushButton(text)
                     b.setProperty('opt', 'true')
                     b.setCheckable(True)
+                    b.setProperty('label', o['label'])
                     b.clicked.connect(lambda _=False, i=i, l=o['label'], s=single: self.choose(i, l, s))
                 btns.append(b)
                 self.ask_box.addWidget(b)
+                if d and d.strip().lower() != o.get('label', '').strip().lower():   # 说明另起一行，能自动换行
+                    m = QLabel(d)
+                    m.setObjectName('optdesc')
+                    m.setWordWrap(True)
+                    m.setContentsMargins(26, 0, 4, 4)
+                    self.ask_box.addWidget(m)
             self.groups.append(btns)
         row = QHBoxLayout()
         back = QPushButton(self.tx['back_to_terminal'])
@@ -349,7 +434,7 @@ class ChatWindow(QWidget):
     def choose(self, i, label, submit_now):
         self.picks[i] = {label}
         for b in self.groups[i]:
-            b.setChecked(b.text().split('\n')[0] == label)
+            b.setChecked(b.property('label') == label)
         if submit_now:
             self.answer()
         else:
@@ -379,6 +464,52 @@ class ChatWindow(QWidget):
         send(self.sid, {'text': text})
         self.input.clear()
         self.refresh()
+
+    # ---- 书页外观：画背景、标题；拖封面移动 ----
+    def paintEvent(self, e):
+        if not self.book:
+            return super().paintEvent(e)
+        if self.cover is None or self.cover.size() != self.size():
+            self.cover = book.cover(self.width(), self.height(), self.t['colors'], bool(self.tx['title']))
+        p = QPainter(self)
+        p.drawImage(0, 0, self.cover)
+        p.setRenderHint(QPainter.TextAntialiasing)
+        pr = book.page_rect(self.width(), self.height())
+        f = QFont(self.t['font'] or self.font().family())
+        f.setPixelSize(20)
+        f.setBold(True)
+        f.setLetterSpacing(QFont.AbsoluteSpacing, 6)
+        p.setFont(f)
+        p.setPen(QColor(self.t['colors']['rubric']))
+        top = 34 if self.tx['title'] else 0         # 没有标题：花饰线和会话名往上提
+        if self.tx['title']:
+            p.drawText(QRectF(pr.left(), pr.top() + 8, pr.width(), 30), Qt.AlignCenter, self.tx['title'])
+        if self.subtitle:
+            f.setPixelSize(11)
+            f.setBold(False)
+            f.setItalic(True)
+            f.setLetterSpacing(QFont.AbsoluteSpacing, 1)
+            p.setFont(f)
+            p.setPen(QColor(self.t['colors']['muted']))
+            p.drawText(QRectF(pr.left(), pr.top() + 26 + top, pr.width(), 16), Qt.AlignCenter, self.subtitle)
+
+    def resizeEvent(self, e):
+        if self.book:
+            pr = book.page_rect(self.width(), self.height())
+            self.close_btn.setGeometry(int(pr.right()) - 28, int(pr.top()) + 6, 22, 22)
+        super().resizeEvent(e)
+
+    def mousePressEvent(self, e):
+        if self.book and e.button() == Qt.LeftButton:
+            self.drag_from = e.globalPosition().toPoint() - self.pos()
+
+    def mouseMoveEvent(self, e):
+        if self.book and self.drag_from is not None:
+            self.move(e.globalPosition().toPoint() - self.drag_from)
+
+    def mouseReleaseEvent(self, e):
+        if self.book:
+            self.drag_from = None
 
     # ---- 打开 ----
     def open_near(self, pet=None):
