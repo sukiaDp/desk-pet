@@ -288,7 +288,7 @@ class ChatWindow(QWidget):
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll.setMinimumHeight(220)
         self.scroll.verticalScrollBar().valueChanged.connect(self.on_scroll)
-        self.scroll.verticalScrollBar().rangeChanged.connect(lambda *_: self.update_down())
+        self.scroll.verticalScrollBar().rangeChanged.connect(self.on_range)
         self.down = QPushButton('↓', self.scroll)   # 不在最底下时：右下角一个「回到底部」
         self.down.setObjectName('tobottom')
         self.down.setCursor(Qt.PointingHandCursor)
@@ -300,6 +300,8 @@ class ChatWindow(QWidget):
         self.anim.setEasingCurve(QEasingCurve.OutCubic)
         self.anim.finished.connect(self.anim_done)
         self.stick, self.target = False, 0
+        # 滚动状态：follow = 你想不想跟着底部（只由你自己的滚动决定）；settling = 程序正在重建、排版，滚动条怎么变都不算数
+        self.follow, self.settling, self.saved_val, self.keep_val, self.shown_count = True, False, 0, None, 0
         self.scroll.viewport().installEventFilter(self)
         self.act = QLabel()                      # 页尾一行：CC 正在做什么
         self.act.setObjectName('activity')
@@ -477,8 +479,14 @@ class ChatWindow(QWidget):
         fresh = self.shown_key is None or self.force_bottom   # 刚打开 / 换会话 / 自己发了消息：一律到底
         self.shown_key = key
         bar = self.scroll.verticalScrollBar()
-        was_bottom = fresh or self.at_bottom()
-        old_val = bar.value()
+        if fresh:
+            self.follow = True
+        if not self.settling:                    # 上一次还没排完就又来一次：沿用上次记下的位置，别量重建中途的值
+            self.saved_val = bar.value()
+        self.settling = True
+        was_bottom = self.follow
+        last = max([e.get('id', 0) for e in log] + [m.get('id', 0) for m in pending] + [0])   # 最后一条的编号（一页最多 30 条，不能按条数算）
+        grew, self.shown_count = last > self.shown_count and not fresh, last
         while self.list.count() > 1:
             w = self.list.takeAt(1).widget()
             if w and w not in (self.ask, self.act):   # 提问区、进度行留着，重新排到最后
@@ -499,19 +507,25 @@ class ChatWindow(QWidget):
         self.draw_ask(ask)
         # 等布局排好再滚：本来在底下就跟着到底；往上翻着看就停在原处，右下角提示有新消息；加载更早的记录时保持离底部的距离
         keep, self.keep_from_bottom, self.force_bottom = self.keep_from_bottom, None, False
-        if keep is None and not was_bottom:
-            self.new_below = True
+        self.keep_val = keep
+        if grew and keep is None and not was_bottom:
+            self.new_below = True                # 翻着看的时候真的来了新消息
         def settle():
-            if keep is not None:
+            if keep is not None:                 # 加载更早的记录：保持离底部的距离
                 bar.setValue(bar.maximum() - keep)
             elif fresh:                          # 刚打开 / 换会话 / 自己发了消息：直接到底
                 self.anim.stop()
                 bar.setValue(bar.maximum())
             elif was_bottom:                     # 本来就在底下：从原位置平滑滑到底
-                bar.setValue(old_val)
+                bar.setValue(self.saved_val)
                 self.smooth_to(bar.maximum(), stick=True)
-            else:
-                bar.setValue(old_val)
+            else:                                # 往上翻着看：停在原处
+                bar.setValue(self.saved_val)
+            QTimer.singleShot(200, end_settle)   # 再等一会儿：排版晚到的变化（图片加载等）也照这个规则处理
+        def end_settle():
+            self.settling, self.keep_val = False, None
+            if self.follow and self.anim.state() != QAbstractAnimation.Running:
+                bar.setValue(bar.maximum())
             self.update_down()
         QTimer.singleShot(60, settle)
 
@@ -539,11 +553,26 @@ class ChatWindow(QWidget):
 
     def at_bottom(self):
         bar = self.scroll.verticalScrollBar()
-        if self.stick and self.anim.state() == QAbstractAnimation.Running:
-            return True                          # 正在滑向底部：算在底部
         return bar.value() >= bar.maximum() - round(6 * self.k)
 
+    def on_range(self, *_):
+        """内容高度变了：跟着底部就贴到底；重建期间没跟随就钉在原处。"""
+        bar = self.scroll.verticalScrollBar()
+        if self.anim.state() == QAbstractAnimation.Running:
+            if self.stick:
+                self.anim.setEndValue(bar.maximum())   # 正在滑向底部：终点跟着变
+            return
+        if self.settling and self.keep_val is not None:
+            bar.setValue(bar.maximum() - self.keep_val)
+        elif self.follow:
+            bar.setValue(bar.maximum())
+        elif self.settling:
+            bar.setValue(self.saved_val)
+        if not self.settling:
+            self.update_down()
+
     def to_bottom(self):
+        self.follow = True
         self.smooth_to(self.scroll.verticalScrollBar().maximum(), stick=True)
 
     # ---- 平滑滚动：滚轮、回到底部都用动画滑过去 ----
@@ -561,6 +590,8 @@ class ChatWindow(QWidget):
         if self.stick and bar.value() < bar.maximum():   # 滑的途中内容又变长了：补到真正的底
             bar.setValue(bar.maximum())
         self.stick = False
+        if not self.settling:
+            self.follow = self.at_bottom()       # 滚轮滑完：停在底部就继续跟随
         self.update_down()
 
     def wheel(self, e):
@@ -568,13 +599,17 @@ class ChatWindow(QWidget):
         if not e.pixelDelta().isNull() or not e.angleDelta().y():
             return False
         bar = self.scroll.verticalScrollBar()
+        if e.angleDelta().y() > 0:
+            self.follow = False                  # 往上滚：马上不跟随，免得滑的途中被新消息拽回底部
         base = self.target if self.anim.state() == QAbstractAnimation.Running else bar.value()
         self.smooth_to(base - e.angleDelta().y() / 120 * round(90 * self.k))
         return True
 
     def update_down(self):
         """右下角的「回到底部」：不在最底下才显示；翻着看时来了新消息就写上「新消息」。"""
-        if self.at_bottom():
+        if self.settling:
+            return
+        if self.at_bottom() or (self.stick and self.anim.state() == QAbstractAnimation.Running):
             self.new_below = False
             self.down.hide()
             return
@@ -588,6 +623,10 @@ class ChatWindow(QWidget):
         self.down.raise_()
 
     def on_scroll(self, v):
+        if self.settling:                        # 程序重建、排版引起的变化：不算你的滚动
+            return
+        if self.anim.state() != QAbstractAnimation.Running:
+            self.follow = self.at_bottom()       # 拖滚动条、触摸板：停在哪就按哪算
         self.update_down()
         # 滚到顶：再加载一页更早的记录
         if v == 0 and self.more and self.keep_from_bottom is None:
