@@ -161,3 +161,14 @@ def ring_avatar(pix, color):
     p.drawEllipse(QRectF(1, 1, s - 2, s - 2))
     p.end()
     return out
+
+
+def seal_icon(size, color):
+    """火漆印上压的十字。"""
+    pix = QPixmap(size, size)
+    pix.fill(Qt.transparent)
+    p = QPainter(pix)
+    p.setRenderHint(QPainter.Antialiasing)
+    cross(p, QPointF(size / 2, size / 2), size * 0.36, QColor(color))
+    p.end()
+    return pix

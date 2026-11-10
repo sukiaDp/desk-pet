@@ -10,8 +10,8 @@ import os
 import time
 from pathlib import Path
 
-from PySide6.QtCore import QRectF, Qt, QTimer
-from PySide6.QtGui import QColor, QFont, QGuiApplication, QPainter, QPainterPath, QPixmap
+from PySide6.QtCore import QRectF, QSize, Qt, QTimer
+from PySide6.QtGui import QColor, QFont, QIcon, QGuiApplication, QPainter, QPainterPath, QPixmap
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel, QLineEdit, QPushButton,
                                QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
@@ -58,7 +58,7 @@ QComboBox {{ color: {c['ink']}; background: transparent; border: none; border-bo
 QComboBox QAbstractItemView {{ color: {c['ink']}; background: {c['page']}; selection-background-color: {c['gold']}; }}
 QLineEdit {{ color: {c['ink']}; background: transparent; border: none; border-bottom: 1px solid {c['border']}; padding: 6px 2px; font-size: 14px; }}
 QLineEdit:focus {{ border-bottom: 1px solid {c['gold']}; }}
-QPushButton#send {{ min-width: 36px; min-height: 36px; max-height: 36px; padding: 0 10px; border-radius: 18px; color: {c['accent_ink']};
+QPushButton#send {{ padding: 0; border-radius: 19px; font-size: 20px; color: {c['accent_ink']};
   background: qradialgradient(cx:0.4, cy:0.35, radius:0.8, stop:0 {QColor(c['rubric']).lighter(135).name()}, stop:1 {QColor(c['rubric']).darker(140).name()});
   border: 2px solid {QColor(c['rubric']).darker(160).name()}; }}
 QPushButton#send:disabled {{ background: {c['border']}; color: {c['muted']}; border-color: {c['border']}; }}
@@ -215,6 +215,10 @@ class ChatWindow(QWidget):
             b = book.BORDER
             lay.setContentsMargins(b + 16, b + book.header(bool(self.tx['title'])), b + 5 + 16, b + 5 + 12)
             self.btn.setText(self.tx.get('seal', self.tx['send']))
+            self.btn.setFixedSize(38, 38)            # 圆形火漆印；没写字就压一个十字
+            if not self.btn.text():
+                self.btn.setIcon(QIcon(book.seal_icon(22, theme['colors']['accent_ink'])))
+                self.btn.setIconSize(QSize(22, 22))
         lay.addLayout(top)
         lay.addWidget(self.perm)
         lay.addWidget(self.scroll, 1)

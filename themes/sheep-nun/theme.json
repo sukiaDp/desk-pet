@@ -34,7 +34,7 @@
   },
   "text": {
     "title": "",
-    "placeholder": "在这里写下想说的话…（回车呈上）",
+    "placeholder": "在这里写下想说的话…",
     "empty": "这里还很安静。在下面写下想对 CC 说的话，或者照常在终端里聊，这里会同步。",
     "send": "送出",
     "submit": "就这样",
@@ -44,7 +44,7 @@
     "perm": "终端里在等你批准：{tool}（权限只能在终端里点）",
     "new_reply": "有回信啦，点我看",
     "no_session": "没有开 /desk-pet 的会话：在 CC 里输入 /desk-pet",
-    "seal": "呈上"
+    "seal": ""
   },
   "look": "book"
 }
