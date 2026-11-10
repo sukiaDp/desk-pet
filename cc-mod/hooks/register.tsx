@@ -34,6 +34,7 @@ let ack = 0                     // 已处理的桌宠消息 id
 let chatLog: Entry[] = []       // 最近的对话，写给桌宠
 let ask: Ask | null = null      // 正在等桌宠回答的提问
 let perm: string | null = null  // 终端里正在等批准的工具（只用来提醒）
+let activity = ''               // CC 正在做什么，给桌宠窗口页尾那一行
 const answers = new Map<string, any>()
 let petTurn = false             // 这一轮是不是从桌宠发起的
 let petTexts: string[] = []     // 从桌宠提交、还没开始的消息
@@ -68,7 +69,7 @@ async function write($: any, s?: State, force = false) {
 async function writeOut($: any) {
   try {
     const p = await paths($)
-    await $.fs.write(p.outbox, JSON.stringify({ ack, log: chatLog.slice(-40), ask, perm }))
+    await $.fs.write(p.outbox, JSON.stringify({ ack, log: chatLog.slice(-40), ask, perm, activity }))
   } catch {}
 }
 
@@ -139,6 +140,32 @@ async function askPet($: any, a: Ask): Promise<any> {
   }
 }
 
+// 工具调用说成人话：读 chat.py、跑命令：npm test、搜索「foo」……
+function describe(e: any): string {
+  const base = (f: any) => String(f ?? '').split('/').filter(Boolean).pop() ?? ''
+  const cut = (x: any, n = 40) => { const t = String(x ?? '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n) + '…' : t }
+  switch (e.tool) {
+    case 'Read': return `读 ${base(e.file_path)}`
+    case 'Edit': case 'MultiEdit': case 'NotebookEdit': return `改 ${base(e.file_path ?? e.notebook_path)}`
+    case 'Write': return `写 ${base(e.file_path)}`
+    case 'Bash': return `跑命令：${cut(e.description || e.command)}`
+    case 'Grep': return `搜索「${cut(e.pattern, 24)}」`
+    case 'Glob': return `找文件 ${cut(e.pattern, 30)}`
+    case 'WebFetch': { try { return `看网页 ${new URL(e.url).host}` } catch { return '看网页' } }
+    case 'WebSearch': return `上网搜「${cut(e.query, 24)}」`
+    case 'Agent': case 'Task': return `派子任务：${cut(e.description, 30)}`
+    case 'TodoWrite': return '整理待办'
+    case 'AskUserQuestion': return '等你回答'
+    default: return `用 ${e.tool}`
+  }
+}
+
+async function setActivity($: any, a: string) {
+  if (a === activity) return
+  activity = a
+  if (await read($, enabledAtom)) await writeOut($)
+}
+
 async function setEnabled($: any, on: boolean) {
   await update($, enabledAtom, () => on)
   await write($, undefined, true)
@@ -204,6 +231,7 @@ export const register: Register = on => {
       if (i >= 0) petTexts.splice(i, 1)
       if (PRAISE.test(e.text)) praised = await $.clock.now()
       await write($, 'working')
+      await setActivity($, '在想')
     }
     return next(e)
   })
@@ -211,6 +239,7 @@ export const register: Register = on => {
   on('turn.complete', async ($, e, next) => {
     if (!(e as any).agentId) {
       await write($, e.reason === 'answer' ? 'done' : e.reason === 'aborted' ? 'idle' : 'error')
+      activity = ''
       if (await read($, enabledAtom)) {
         const text = e.reason === 'answer' ? (e as any).answer ?? '' : e.reason === 'aborted' ? '（这一轮被中断了）' : '（这一轮出错了）'
         await addLog($, 'cc', text, petTurn ? 'pet' : 'terminal')
@@ -243,7 +272,10 @@ export const register: Register = on => {
 
   on('tool.call', async ($, e, next) => {
     const main = !(e as any).agentId
-    if (main) await write($, ASKS_USER.has(e.tool) ? 'waiting' : READS.has(e.tool) ? 'reading' : 'working')
+    if (main) {
+      await write($, ASKS_USER.has(e.tool) ? 'waiting' : READS.has(e.tool) ? 'reading' : 'working')
+      await setActivity($, describe(e))
+    }
     const r = await next(e)
     // 提问在终端里先答了：收起桌宠窗口里的选项
     if (main && e.tool === 'AskUserQuestion' && ask) {

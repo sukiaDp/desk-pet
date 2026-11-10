@@ -16,6 +16,8 @@ DEFAULT = {
     'name': '桌宠',
     'assets': 'assets',
     'font': '',
+    'font_latin': '',               # 西文字体（可选）；中文缺字时用 font 补
+    'font_files': [],               # 主题自带的字体文件，相对主题目录
     'avatar': None,                 # [x, y, 边长]：从默认姿态图里裁头像；不写就不显示头像
     'colors': {
         'bg': '#e7ebf0', 'panel': '#ffffff', 'ink': '#222222', 'muted': '#8a929a', 'border': '#c9d3dd',
@@ -30,6 +32,7 @@ DEFAULT = {
         'send': '发送', 'submit': '提交', 'back_to_terminal': '回终端答', 'from_terminal': '在终端里发的',
         'sending': '（发送中…）', 'perm': '终端里在等你批准：{tool}（权限只能在终端里点）',
         'new_reply': '有新回复，点我看', 'no_session': '没有开 /desk-pet 的会话：在 CC 里输入 /desk-pet',
+        'activity': '正在{what}',
         'image_note': '（附上了 {n} 张图片，请用 Read 工具查看：\n{paths}）',
     },
 }
@@ -73,4 +76,20 @@ def load(theme_id=None):
     t['colors'] = {**DEFAULT['colors'], **raw.get('colors', {})}
     t['text'] = {**DEFAULT['text'], **raw.get('text', {})}
     t['assets'] = Path(os.environ.get('DESK_PET_ASSETS') or d / t['assets'])
+    t['font_files'] = [str(d / f) for f in t['font_files']]
+    return t
+
+
+def register_fonts(t):
+    """装上主题自带的字体（要在 QApplication 建好之后调），设成整个程序的默认字体：
+    西文字体排前面，中文缺字时用 font。样式表里只写字号、不写字体，就都用这个。"""
+    from PySide6.QtGui import QFont, QFontDatabase
+    from PySide6.QtWidgets import QApplication
+    for f in t['font_files']:
+        QFontDatabase.addApplicationFont(f)
+    families = [f for f in (t['font_latin'], t['font']) if f]
+    if families:
+        f = QApplication.font()
+        f.setFamilies(families)
+        QApplication.setFont(f)
     return t

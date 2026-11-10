@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFileDialog, 
 import book
 
 CHAT = Path.home() / '.cache/desk-pet/chat'
+PAGE = 30                                          # 聊天记录一页多少条
 MEDIA = Path.home() / '.cache/desk-pet/media'      # 发出去的图片：media/<会话id>/
 IMAGE_EXT = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp'}
 # 聊天窗大小：(宽, 高, 字号倍数)；托盘「设置 → 聊天窗大小」切换
@@ -36,7 +37,7 @@ def rgba(hex_, a):
 def book_style(t):
     """书页外观：没有气泡，正文像印在纸上；你的话是朱红斜体，像经书里的红字批注。"""
     c = t['colors']
-    font = f"QWidget#chat, QWidget#chat * {{ font-family: '{t['font']}'; }}" if t['font'] else ''
+    font = ''                                    # 字体由 theme.register_fonts 设成程序默认字体
     return font + f"""
 QWidget#chat {{ background: transparent; color: {c['ink']}; }}
 QWidget#chat QLabel, QWidget#chat QCheckBox {{ color: {c['ink']}; background: transparent; }}
@@ -52,6 +53,7 @@ QWidget#chat QLabel[role="cc"] {{ color: {c['ink']}; font-size: 14px; padding: 9
 QWidget#chat QLabel[role="user"][pending="true"] {{ color: {c['muted']}; }}
 QWidget#chat QLabel#meta {{ color: {c['muted']}; font-size: 11px; font-style: italic; }}
 QWidget#chat QLabel#optdesc {{ color: {c['muted']}; font-size: 12px; }}
+QWidget#chat QLabel#activity {{ color: {c['muted']}; font-style: italic; font-size: 12px; padding: 4px 6px; }}
 QWidget#chat QLabel#sep {{ color: {c['gold']}; font-size: 12px; }}
 QWidget#chat QLabel#perm {{ color: {c['rubric']}; background: {rgba(c['rubric'], 0.08)}; border-left: 3px solid {c['rubric']}; padding: 4px 8px; font-style: italic; }}
 QFrame#ask {{ background: {rgba('#fffaf0', 0.45)}; border: none; border-top: 1px solid {c['gold']}; border-bottom: 1px solid {c['gold']}; }}
@@ -91,7 +93,7 @@ def style(t, k=1.0):
 def plain_style(t):
     """普通聊天窗；每个控件都写明颜色，不吃系统深色主题。"""
     c = t['colors']
-    font = f"QWidget#chat, QWidget#chat * {{ font-family: '{t['font']}'; }}" if t['font'] else ''
+    font = ''                                    # 字体由 theme.register_fonts 设成程序默认字体
     return font + f"""
 QWidget#chat {{ background: {c['bg']}; color: {c['ink']}; }}
 QWidget#chat QLabel, QWidget#chat QCheckBox {{ color: {c['ink']}; }}
@@ -104,6 +106,7 @@ QWidget#chat QLabel[role="cc"] {{ background: {c['pet_bg']}; color: {c['pet_ink'
 QWidget#chat QLabel[role="user"][pending="true"] {{ color: {c['muted']}; }}
 QWidget#chat QLabel#meta {{ color: {c['muted']}; font-size: 11px; }}
 QWidget#chat QLabel#optdesc {{ color: {c['muted']}; font-size: 12px; }}
+QWidget#chat QLabel#activity {{ color: {c['muted']}; font-style: italic; font-size: 12px; padding: 4px 6px; }}
 QWidget#chat QLabel#perm {{ background: {c['warn_bg']}; color: {c['warn_ink']}; border-radius: 8px; padding: 6px 9px; }}
 QFrame#ask {{ background: {c['panel']}; border: 1px solid {c['gold']}; border-radius: 12px; }}
 QFrame#ask QLabel {{ background: transparent; }}
@@ -203,6 +206,10 @@ class ChatWindow(QWidget):
         self.shown_key = None        # 上次画的内容，没变就不重画
         self.ask_qid = None
         self.seen = {}               # sid -> 看过的最后一条 CC 回复 id
+        self.hist = {}               # sid -> 全部聊天记录（chat/<sid>.history.jsonl，桌宠自己存）
+        self.show_n = PAGE           # 当前会话显示最近多少条；滚到顶再加一页
+        self.keep_from_bottom = None # 加载更早的记录时，保持离底部的距离不变
+        self.activity, self.dots, self.more = '', 0, False
         self.unread = False          # 窗口没开时来了新回复 / 新提问
 
         top = QHBoxLayout()
@@ -226,6 +233,13 @@ class ChatWindow(QWidget):
         self.scroll.setWidget(self.msgs)
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll.setMinimumHeight(220)
+        self.scroll.verticalScrollBar().valueChanged.connect(self.on_scroll)
+        self.act = QLabel()                      # 页尾一行：CC 正在做什么
+        self.act.setObjectName('activity')
+        self.act.hide()
+        tick = QTimer(self)                      # 省略号一跳一跳
+        tick.timeout.connect(self.tick_dots)
+        tick.start(450)
 
         self.ask = QFrame()
         self.ask.setObjectName('ask')
@@ -339,6 +353,7 @@ class ChatWindow(QWidget):
         # 没开窗口时：其他会话来了新回复或提问也要提醒
         for sid, _, _ in sessions:
             out = read_json(CHAT / f'{sid}.out.json') or {}
+            self.archive(sid, out.get('log', []))
             last = max([e['id'] for e in out.get('log', []) if e.get('role') == 'cc'] or [0])
             if sid not in self.seen:
                 self.seen[sid] = last          # 第一次见到这个会话：旧的不算未读
@@ -357,7 +372,7 @@ class ChatWindow(QWidget):
 
     def on_pick(self, i):
         self.sid = self.pick.itemData(i)
-        self.shown_key = None
+        self.shown_key, self.show_n = None, PAGE
         self.refresh()
 
     # ---- 画对话 ----
@@ -369,7 +384,12 @@ class ChatWindow(QWidget):
         ack = out.get('ack', 0)
         pending = [m for m in (read_json(CHAT / f'{self.sid}.in.json') or {}).get('msgs', [])
                    if m.get('id', 0) > ack and (m.get('text') or m.get('media'))]
-        self.draw(out.get('log', []), out.get('ask'), out.get('perm'), pending)
+        self.archive(self.sid, out.get('log', []))
+        hist = self.hist.get(self.sid, [])
+        self.more = len(hist) > self.show_n
+        self.activity = '' if out.get('ask') else (out.get('activity') or '')
+        self.tick_dots(step=False)
+        self.draw(hist[-self.show_n:], out.get('ask'), out.get('perm'), pending)
         if self.isVisible():
             self.seen[self.sid] = max([e['id'] for e in out.get('log', []) if e.get('role') == 'cc'] or [0])
             self.unread = False
@@ -384,7 +404,7 @@ class ChatWindow(QWidget):
         self.shown_key = key
         while self.list.count() > 1:
             w = self.list.takeAt(1).widget()
-            if w and w is not self.ask:          # 提问区留着，重新排到最后
+            if w and w not in (self.ask, self.act):   # 提问区、进度行留着，重新排到最后
                 w.deleteLater()
         if not log and not pending:
             self.add_note(self.tx['empty'])
@@ -397,10 +417,48 @@ class ChatWindow(QWidget):
                 sep.setAlignment(Qt.AlignCenter)
                 self.list.addWidget(sep)
             self.add_msg(role, text, src=src, pending=pend, media=media)
-        self.list.addWidget(self.ask)            # 提问接在对话后面，跟着一起滚动
+        self.list.addWidget(self.act)            # 进度一行、提问区接在对话后面，跟着一起滚动
+        self.list.addWidget(self.ask)
         self.draw_ask(ask)
-        bar = self.scroll.verticalScrollBar()       # 等布局排好再滚到底
-        QTimer.singleShot(60, lambda: bar.setValue(bar.maximum()))
+        bar = self.scroll.verticalScrollBar()       # 等布局排好再滚：平时滚到底；加载更早的记录时停在原处
+        keep, self.keep_from_bottom = self.keep_from_bottom, None
+        QTimer.singleShot(60, lambda: bar.setValue(bar.maximum() - keep if keep is not None else bar.maximum()))
+
+    # ---- 聊天记录：桌宠自己存一份全量的，mod 那边只留最近 40 条 ----
+    def archive(self, sid, log):
+        h = self.hist.get(sid)
+        f = CHAT / f'{sid}.history.jsonl'
+        if h is None:                            # 第一次：从文件读
+            h = []
+            try:
+                for line in f.read_text(encoding='utf-8').splitlines():
+                    h.append(json.loads(line))
+            except (OSError, ValueError):
+                pass
+            self.hist[sid] = h
+        last = h[-1]['id'] if h else 0
+        new = [e for e in log if e.get('id', 0) > last]
+        if new:
+            h.extend(new)
+            try:
+                with f.open('a', encoding='utf-8') as fp:
+                    fp.writelines(json.dumps(e, ensure_ascii=False) + '\n' for e in new)
+            except OSError:
+                pass
+
+    def on_scroll(self, v):
+        # 滚到顶：再加载一页更早的记录
+        if v == 0 and self.more and self.keep_from_bottom is None:
+            self.keep_from_bottom = self.scroll.verticalScrollBar().maximum()
+            self.show_n += PAGE
+            self.refresh()
+
+    def tick_dots(self, step=True):
+        if step:
+            self.dots = (self.dots + 1) % 3
+        self.act.setVisible(bool(self.activity))
+        if self.activity:
+            self.act.setText(self.tx['activity'].format(what=self.activity) + ' ' + '·' * (self.dots + 1))
 
     def add_note(self, text):
         n = QLabel(text)
@@ -437,7 +495,7 @@ class ChatWindow(QWidget):
         maxw = int(avail * (0.96 if role == 'cc' else 0.85))
         b.setMaximumWidth(maxw)
         # 自动换行的标签会估得太窄：按最长一行的实际宽度给最小宽度（这时样式表还没套上，按样式里的字号自己量）
-        f = QFont(self.t['font'] or b.font().family())
+        f = QFont(QApplication.font())
         f.setPixelSize(round((14 if self.book else 13) * self.k))
         f.setItalic(self.book and role == 'user')
         fm = QFontMetrics(f)
@@ -657,7 +715,7 @@ class ChatWindow(QWidget):
         p.drawImage(0, 0, self.cover)
         p.setRenderHint(QPainter.TextAntialiasing)
         pr = book.page_rect(self.width(), self.height())
-        f = QFont(self.t['font'] or self.font().family())
+        f = QFont(QApplication.font())
         f.setPixelSize(round(20 * self.k))
         f.setBold(True)
         f.setLetterSpacing(QFont.AbsoluteSpacing, 6)

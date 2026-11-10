@@ -70,7 +70,20 @@ ANIM = {'working': 'running', 'reading': 'review', 'waiting': 'waiting', 'done':
 LABEL = {'working': '工作中', 'reading': '查看中', 'waiting': '等你回复', 'done': '完成啦', 'error': '出错了', 'idle': ''}
 PRIORITY = ['waiting', 'error', 'working', 'reading', 'done', 'idle']
 INTRO = {'done': 'jumping', 'waiting': 'startled-avert'}   # 切进某个状态时先播一遍的小动作
-RANDOM = ['prayer-peek', 'sneeze', 'brave-gaze']           # 空闲时偶尔播；循环类播 4 秒；平时就是站着
+# 空闲时偶尔播的小动作，按时段换口味（权重）；循环类播 4 秒，平时就是站着
+RANDOM_BY_TIME = {
+    'morning': {'prayer-peek': 3, 'review': 2, 'waving': 2, 'brave-gaze': 1, 'sneeze': 1, 'jumping': 1},   # 6–11 点：晨祷、读经
+    'day': {'brave-gaze': 2, 'review': 2, 'sneeze': 1, 'jumping': 1, 'modest-curtsy': 1, 'prayer-peek': 1},
+    'evening': {'prayer-peek': 3, 'review': 2, 'sit-swing': 2, 'sneeze': 1, 'brave-gaze': 1},             # 18–23 点：晚祷
+    'night': {'sleepy-nod': 3, 'sit-swing': 2, 'prayer-peek': 1, 'sneeze': 1},                              # 23–6 点：犯困
+}
+
+
+def daypart():
+    h = time.localtime().tm_hour
+    return 'morning' if 6 <= h < 11 else 'day' if 11 <= h < 18 else 'evening' if 18 <= h < 23 else 'night'
+
+
 LONG_IDLE = ['sit-swing', 'sleepy-nod']                  # 闲置太久：随机坐下或打瞌睡，一直保持
 if DEBUG:
     RANDOM_MS, BORED_MS, LONG_IDLE_MS = (3e3, 4e3), 8e3, 12e3
@@ -173,6 +186,8 @@ class Pet(QWidget):
         self.long_idle = None                    # 这次闲置选中的坐下 / 打瞌睡
         self.next_random = now_ms() + RANDOM_MS[0]
         self.praised = None
+        if 'waving' in self.clips:               # 刚出来先招招手
+            self.temp = {'key': 'waving', 'until': now_ms() + 3000}
         # 播放
         self.cur, self.phase, self.idx, self.flip, self.until = None, 'sustain', 0, False, 0
         self.frame = self.neutral
@@ -206,7 +221,8 @@ class Pet(QWidget):
         if cc == 'done' and now - self.done_since > DONE_MS:
             cc = 'idle'                          # 招手几秒就够了，之后站着待命、偶尔小动作
         if cc == 'idle':
-            if now - self.idle_since > LONG_IDLE_MS:     # 闲置 30 分钟以上：随机坐下或打瞌睡，保持住
+            limit = LONG_IDLE_MS / 3 if daypart() == 'night' else LONG_IDLE_MS   # 深夜困得快：10 分钟
+            if now - self.idle_since > limit:          # 闲置 30 分钟以上：随机坐下或打瞌睡，保持住
                 if not self.long_idle:
                     self.long_idle = random.choice([k for k in LONG_IDLE if k in self.clips] or [None])
                     log(f'闲置太久 -> {self.long_idle}')
@@ -214,9 +230,9 @@ class Pet(QWidget):
                     return {'key': self.long_idle}
             if now > self.next_random:           # 站着发呆时偶尔做个小动作
                 self.next_random = now + random.uniform(*RANDOM_MS)
-                pool = [k for k in RANDOM if k in self.clips]
+                pool = {k: w for k, w in RANDOM_BY_TIME[daypart()].items() if k in self.clips}
                 if pool:
-                    k = random.choice(pool)
+                    k = random.choices(list(pool), weights=list(pool.values()))[0]
                     self.temp = {'key': k, 'random': True,
                                  'until': None if self.clips[k]['mode'] == 'oneshot' else now + 4000}
                     return {'key': k}
@@ -306,7 +322,7 @@ class Pet(QWidget):
             p.setPen(QColor(c['bubble_border']))
             p.setBrush(QColor(c['bubble_bg']))
             p.drawRoundedRect(8, 4, 184, 22, 11, 11)
-            f = QFont(THEME['font']) if THEME['font'] else QFont()
+            f = QFont(QApplication.font())             # 主题字体（theme.register_fonts 设的）
             f.setPixelSize(12)
             p.setFont(f)
             p.setPen(QColor(c['bubble_ink']))
@@ -408,6 +424,7 @@ def main():
     app = QApplication(sys.argv)
     app.setApplicationName('desk-pet')
     app.setQuitOnLastWindowClosed(False)
+    theme.register_fonts(THEME)                  # 主题自带字体
     pet = Pet()
     pet.show()
 
