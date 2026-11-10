@@ -16,6 +16,18 @@ from pathlib import Path
 # KDE 设了 1.5 倍缩放；向下取整成 1，按物理像素一比一画，像素画不被缩放糊掉（要放大用 DESK_PET_SCALE）
 os.environ['QT_SCALE_FACTOR_ROUNDING_POLICY'] = 'Floor'
 
+# 输入法：pip 装的 PySide6 只带 ibus 插件，没有 fcitx 的；fcitx5 自带 ibus 兼容接口，所以这时改走 ibus
+def _im_module():
+    import importlib.util
+    spec = importlib.util.find_spec('PySide6')
+    plugins = Path(spec.submodule_search_locations[0]) / 'Qt/plugins/platforminputcontexts' if spec else None
+    want = os.environ.get('QT_IM_MODULE', '')
+    if want.startswith('fcitx') and plugins and not any('fcitx' in p.name for p in plugins.glob('*')):
+        os.environ['QT_IM_MODULE'] = 'ibus'
+
+
+_im_module()
+
 from PySide6.QtCore import QPoint, QRect, Qt, QTimer
 from PySide6.QtGui import (QAction, QBitmap, QColor, QCursor, QFont, QGuiApplication, QIcon, QImage,
                            QPainter, QPixmap, QRegion, QTransform)
@@ -29,7 +41,23 @@ THEME = theme.load()                                         # 形象：themes/<
 ASSETS = THEME['assets']
 SESSIONS = Path.home() / '.cache/desk-pet/sessions'
 ALIVE = Path.home() / '.cache/desk-pet/pet.json'      # 桌宠心跳：mod 据此决定提问发不发到聊天窗
-K = max(1, int(os.environ.get('DESK_PET_SCALE') or 1))     # 整数放大倍数
+SETTINGS = Path.home() / '.config/desk-pet/settings.json'   # 托盘「设置」写的：{mirror, scale}
+
+
+def load_settings():
+    try:
+        return json.loads(SETTINGS.read_text())
+    except (OSError, ValueError):
+        return {}
+
+
+def save_settings(**kw):
+    SETTINGS.parent.mkdir(parents=True, exist_ok=True)
+    SETTINGS.write_text(json.dumps({**load_settings(), **kw}))
+
+
+CFG = load_settings()
+K = max(1, int(os.environ.get('DESK_PET_SCALE') or CFG.get('scale') or 1))     # 整数放大倍数
 DEBUG = bool(os.environ.get('DESK_PET_DEBUG'))
 
 W, H = 192, 208                 # 单帧大小
@@ -148,6 +176,7 @@ class Pet(QWidget):
         self.frame = self.neutral
         # 鼠标
         self.press = None
+        self.mirror = bool(CFG.get('mirror'))     # 设置：左右镜像
         self.chat = ChatWindow(THEME, self.neutral)
         self.chat.pet = self
 
@@ -264,7 +293,7 @@ class Pet(QWidget):
         p = QPainter(self.canvas)
         p.scale(K, K)
         p.translate(LEFT, TOP)
-        if self.flip:
+        if self.flip != self.mirror:             # 动作自己的镜像 × 设置里的镜像
             p.setTransform(QTransform(-1, 0, 0, 1, W, 0), True)
         p.drawImage(0, 0, self.frame)
         p.resetTransform()
@@ -296,6 +325,8 @@ class Pet(QWidget):
         dx, dy = rel.x() / K - LEFT - 96, rel.y() / K - TOP - 80
         if math.hypot(dx, dy) > 70:
             a = (math.degrees(math.atan2(dx, -dy)) + 360) % 360
+            if self.mirror:                      # 整体镜像了：视线角度也左右对调
+                a = 360 - a
             self.gaze = self.gaze_clip(round(a / 22.5) * 22.5 % 360)
         else:
             self.gaze = None
@@ -314,7 +345,8 @@ class Pet(QWidget):
         if self.dragging:                        # 按住移动超过几像素算拖动，按方向跑
             self.move(self.press_win + (g - self.press))
             if abs(g.x() - self.drag_x) > 2:
-                self.drag = 'running-right' if g.x() > self.drag_x else 'running-left'
+                right = (g.x() > self.drag_x) != self.mirror   # 镜像时反过来选，翻转后正好朝移动方向跑
+                self.drag = 'running-right' if right else 'running-left'
                 self.drag_until, self.drag_x = now_ms() + 400, g.x()
 
     def mouseReleaseEvent(self, e):
@@ -383,6 +415,20 @@ def main():
     chat = QAction('聊天', menu)
     chat.triggered.connect(lambda: pet.chat.open_near(pet))
     menu.addAction(chat)
+    restart = lambda: os.execv(sys.executable, [sys.executable, *sys.argv])
+    settings = menu.addMenu('设置')
+    mirror = QAction('镜像（左右翻转）', settings, checkable=True, checked=pet.mirror)
+    def set_mirror(on):
+        pet.mirror = on
+        save_settings(mirror=on)
+        pet.render()
+    mirror.toggled.connect(set_mirror)
+    settings.addAction(mirror)
+    size = settings.addMenu('大小')                # 改大小要重启（窗口和素材按倍数建）
+    for n in (1, 2, 3):
+        a = QAction(f'{n} 倍', size, checkable=True, checked=n == K)
+        a.triggered.connect(lambda _=False, n=n: (save_settings(scale=n), restart()))
+        size.addAction(a)
     looks = menu.addMenu('形象')                  # 换形象：记下选择，重启自己
     for tid, name in theme.available():
         a = QAction(name, looks, checkable=True, checked=tid == THEME['id'])
