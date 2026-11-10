@@ -36,11 +36,12 @@ ANIM = {'working': 'running', 'reading': 'review', 'waiting': 'waiting', 'done':
 LABEL = {'working': '工作中', 'reading': '查看中', 'waiting': '等你回复', 'done': '完成啦', 'error': '出错了', 'idle': ''}
 PRIORITY = ['waiting', 'error', 'working', 'reading', 'done', 'idle']
 INTRO = {'done': 'jumping', 'waiting': 'startled-avert'}   # 切进某个状态时先播一遍的小动作
-RANDOM = ['prayer-peek', 'sneeze', 'brave-gaze']           # 空闲时偶尔播；循环类播 4 秒
+RANDOM = ['prayer-peek', 'sneeze', 'brave-gaze']           # 空闲时偶尔播；循环类播 4 秒；平时就是站着
+LONG_IDLE = ['sit-swing', 'sleepy-nod']                  # 闲置太久：随机坐下或打瞌睡，一直保持
 if DEBUG:
-    SIT_MS, SLEEP_MS, RANDOM_MS, BORED_MS = 8e3, 16e3, (3e3, 4e3), 8e3
+    RANDOM_MS, BORED_MS, LONG_IDLE_MS = (3e3, 4e3), 8e3, 12e3
 else:
-    SIT_MS, SLEEP_MS, RANDOM_MS, BORED_MS = 120e3, 300e3, (20e3, 40e3), 60e3
+    RANDOM_MS, BORED_MS, LONG_IDLE_MS = (20e3, 40e3), 60e3, 30 * 60e3
 CLICK_CURTSY_MS, CLICK_GAZE_MS = 3000, 8000
 
 T0 = time.monotonic()
@@ -121,6 +122,7 @@ class Pet(QWidget):
         self.temp = None                         # 临时动作 {key, until, urgent, random}
         self.drag, self.drag_until = None, 0     # 拖动时左右跑
         self.idle_since = self.waiting_since = now_ms()
+        self.long_idle = None                    # 这次闲置选中的坐下 / 打瞌睡
         self.next_random = now_ms() + RANDOM_MS[0]
         self.praised = None
         # 播放
@@ -150,11 +152,12 @@ class Pet(QWidget):
         if self.gaze and now < self.gaze_until:
             return self.gaze
         if self.cc == 'idle':
-            idle_for = now - self.idle_since
-            if idle_for > SLEEP_MS and 'sleepy-nod' in self.clips:
-                return {'key': 'sleepy-nod'}
-            if idle_for > SIT_MS and 'sit-swing' in self.clips:
-                return {'key': 'sit-swing'}
+            if now - self.idle_since > LONG_IDLE_MS:     # 闲置 30 分钟以上：随机坐下或打瞌睡，保持住
+                if not self.long_idle:
+                    self.long_idle = random.choice([k for k in LONG_IDLE if k in self.clips] or [None])
+                    log(f'闲置太久 -> {self.long_idle}')
+                if self.long_idle:
+                    return {'key': self.long_idle}
             if now > self.next_random:           # 站着发呆时偶尔做个小动作
                 self.next_random = now + random.uniform(*RANDOM_MS)
                 pool = [k for k in RANDOM if k in self.clips]
@@ -295,6 +298,7 @@ class Pet(QWidget):
             now = now_ms()
             self.temp = {'key': 'modest-curtsy', 'until': now + CLICK_CURTSY_MS, 'urgent': True}
             self.gaze_until = now + CLICK_CURTSY_MS + CLICK_GAZE_MS
+            self.idle_since, self.long_idle = now, None   # 点醒她，重新计闲置
             log('点击')
         self.press = None
 
@@ -307,7 +311,7 @@ class Pet(QWidget):
             if INTRO.get(state) in self.clips:
                 self.temp = {'key': INTRO[state]}
             if state == 'idle':
-                self.idle_since = now
+                self.idle_since, self.long_idle = now, None
             if state == 'waiting':
                 self.waiting_since = now
         self.cc = state

@@ -10,7 +10,7 @@
 
 ## 和 CC 联动
 
-`cc-mod/` 是一个 CC mod（已装在用户级：`desk-pet@local-mods`），**按会话开启**：默认不推送，在会话里输入 `/desk-pet` 打开、再输入一次关闭（也可以 `/desk-pet on|off`）；用 `DESK_PET=1 claude` 启动的会话默认打开。打开时状态栏显示「桌宠：开」。
+`cc-mod/` 是一个 CC mod（已装在用户级：`desk-pet@local-mods`），**按会话开启**：默认不推送，在会话里输入 `/desk-pet` 打开、再输入一次关闭（也可以 `/desk-pet on|off`）；用 `DESK_PET=1 claude` 启动的会话默认打开。打开时提示框右下角显示绿色「● 桌宠」。等你回复只在真的弹出权限对话框时才算（auto 模式自动放行的不算）。
 
 打开的会话把状态写到
 `~/.cache/desk-pet/sessions/<会话id>.json`，每 60 秒写一次心跳。桌宠每秒读一次、汇总，优先级：等你回复 > 出错 > 工作中 > 查看中 > 完成 > 空闲。
@@ -23,12 +23,12 @@
 | 等你回复（权限、提问） | 先 startled-avert（吓一跳），再 waiting；超过 1 分钟没人理 → bored-wait（无聊等待） |
 | 完成 | 先 jumping（跳一下），再 waving（招手） |
 | 出错 | failed |
-| 空闲 | idle；偶尔随机 prayer-peek / sneeze / brave-gaze |
-| 空闲 2 分钟 | sit-swing（坐下晃脚），5 分钟 sleepy-nod（打瞌睡） |
+| 空闲 | 站着（idle）；偶尔随机 prayer-peek / sneeze / brave-gaze |
+| 闲置 30 分钟以上 | 随机 sit-swing（坐下晃脚）或 sleepy-nod（打瞌睡），保持到 CC 有动静或点她 |
 | 拖动 | running-left / running-right |
 | 点她一下 | modest-curtsy（提裙礼），之后 8 秒视线跟着鼠标（16 个方向） |
 | 你发给 CC 的消息里有夸奖（谢谢、辛苦、厉害、nice…） | hidden-blush（被夸后藏脸） |
 
-缺素材的动画会自动跳过。调试：`DESK_PET_DEBUG=1` 时把动画切换打到 stderr，并把空闲计时缩成 8 秒 / 16 秒。
+缺素材的动画会自动跳过。调试：`DESK_PET_DEBUG=1` 时把动画切换打到 stderr，并把计时缩短（无聊等待 8 秒、闲置 12 秒）。
 
 整个 mod 停用 / 启用：`claude plugin disable desk-pet@local-mods` / `claude plugin enable desk-pet@local-mods`（新会话生效）。
