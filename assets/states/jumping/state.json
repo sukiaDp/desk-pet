@@ -1,0 +1,78 @@
+{
+  "id": "jumping",
+  "name": "轻轻跳跃",
+  "mode": "oneshot",
+  "entry_anchor_source_frame": 0,
+  "exit_anchor_source_frame": 4,
+  "sustain_source_order": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "sustain_source_kind": "existing_in_state_subset",
+  "semantic_revision": "2.0",
+  "phases": {
+    "enter": {
+      "path": "states/jumping/enter",
+      "frame_count": 5,
+      "durations_ms": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "duration_ms": 500,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+      "last_sha256": "bcc6a62c3b458d5e39cbba1e62563058273dcaa27897c296679824bfd8686995"
+    },
+    "sustain": {
+      "path": "states/jumping/sustain",
+      "frame_count": 5,
+      "durations_ms": [
+        100,
+        110,
+        150,
+        110,
+        120
+      ],
+      "duration_ms": 590,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "bcc6a62c3b458d5e39cbba1e62563058273dcaa27897c296679824bfd8686995",
+      "last_sha256": "61df631b18c88664eb85f645e915fb1022cb6aa9562da72616d82e4bbcc2451c"
+    },
+    "exit": {
+      "path": "states/jumping/exit",
+      "frame_count": 5,
+      "durations_ms": [
+        100,
+        110,
+        110,
+        110,
+        120
+      ],
+      "duration_ms": 550,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "61df631b18c88664eb85f645e915fb1022cb6aa9562da72616d82e4bbcc2451c",
+      "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+    }
+  },
+  "demo": "states/jumping/demo-transparent.gif",
+  "transparent_demo": "states/jumping/demo-transparent.gif",
+  "demo_duration_ms": 3410,
+  "pivot": [
+    96,
+    202
+  ],
+  "demo_sustain_cycles": 1,
+  "repeat_policy": "play_once_then_exit"
+}

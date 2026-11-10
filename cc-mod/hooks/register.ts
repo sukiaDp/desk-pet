@@ -8,10 +8,13 @@ type State = 'working' | 'reading' | 'waiting' | 'done' | 'error' | 'idle' | 'en
 const ASKS_USER = new Set(['AskUserQuestion', 'ExitPlanMode'])
 // 只读、查找类工具：桌宠播「低头检查」
 const READS = new Set(['Read', 'Grep', 'Glob', 'LS', 'NotebookRead', 'WebFetch', 'WebSearch'])
+// 用户消息里有夸奖：桌宠藏脸
+const PRAISE = /谢谢|多谢|感谢|辛苦|好棒|真棒|太棒|厉害|牛|漂亮|优秀|不错|干得好|做得好|nice|great|awesome|thank|good job|well done/i
 
 let current: State = 'idle'
 let file: string | undefined
 let cwd = ''
+let praised = 0
 
 async function write($: any, s?: State) {
   if (s) current = s
@@ -21,7 +24,7 @@ async function write($: any, s?: State) {
       file = `${home}/.cache/desk-pet/sessions/${await $.session.id()}.json`
       cwd = await $.session.cwd()
     }
-    await $.fs.write(file, JSON.stringify({ state: current, cwd, ts: await $.clock.now() }))
+    await $.fs.write(file, JSON.stringify({ state: current, cwd, praised, ts: await $.clock.now() }))
   } catch {}
 }
 
@@ -41,7 +44,10 @@ export const register: Register = on => {
   })
 
   on('turn.start', async ($, e, next) => {
-    if (!e.agentId) await write($, 'working')
+    if (!e.agentId) {
+      if (PRAISE.test(e.text)) praised = await $.clock.now()
+      await write($, 'working')
+    }
     return next(e)
   })
 

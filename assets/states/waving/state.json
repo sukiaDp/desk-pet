@@ -1,0 +1,82 @@
+{
+  "id": "waving",
+  "name": "害羞招手",
+  "mode": "loop",
+  "entry_anchor_source_frame": 0,
+  "exit_anchor_source_frame": 0,
+  "sustain_source_order": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    0
+  ],
+  "sustain_source_kind": "new_in_state_motion",
+  "semantic_revision": "2.0",
+  "phases": {
+    "enter": {
+      "path": "states/waving/enter",
+      "frame_count": 5,
+      "durations_ms": [
+        120,
+        160,
+        160,
+        160,
+        140
+      ],
+      "duration_ms": 740,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+      "last_sha256": "57411476274e01f9fd6e4171acea9ffc9954c39d533d053f81babe5f0f2134eb"
+    },
+    "sustain": {
+      "path": "states/waving/sustain",
+      "frame_count": 7,
+      "durations_ms": [
+        110,
+        180,
+        160,
+        180,
+        180,
+        110,
+        110
+      ],
+      "duration_ms": 1030,
+      "mode": "loop",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "57411476274e01f9fd6e4171acea9ffc9954c39d533d053f81babe5f0f2134eb",
+      "last_sha256": "57411476274e01f9fd6e4171acea9ffc9954c39d533d053f81babe5f0f2134eb"
+    },
+    "exit": {
+      "path": "states/waving/exit",
+      "frame_count": 5,
+      "durations_ms": [
+        140,
+        160,
+        160,
+        160,
+        120
+      ],
+      "duration_ms": 740,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "57411476274e01f9fd6e4171acea9ffc9954c39d533d053f81babe5f0f2134eb",
+      "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+    }
+  },
+  "demo": "states/waving/demo-transparent.gif",
+  "transparent_demo": "states/waving/demo-transparent.gif",
+  "demo_duration_ms": 7300,
+  "pivot": [
+    96,
+    202
+  ],
+  "demo_sustain_cycles": 4,
+  "repeat_policy": "repeat_sustain_only_until_exit_requested"
+}

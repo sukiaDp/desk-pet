@@ -1,0 +1,82 @@
+{
+  "id": "waiting",
+  "name": "等待回应",
+  "mode": "loop",
+  "entry_anchor_source_frame": 0,
+  "exit_anchor_source_frame": 0,
+  "sustain_source_order": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    0
+  ],
+  "sustain_source_kind": "new_in_state_motion",
+  "semantic_revision": "2.0",
+  "phases": {
+    "enter": {
+      "path": "states/waiting/enter",
+      "frame_count": 5,
+      "durations_ms": [
+        120,
+        160,
+        160,
+        160,
+        140
+      ],
+      "duration_ms": 740,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+      "last_sha256": "a8a2f95ca4b18e98ee79f6eaa34f57da94e5e14da22cb2616f0f22afca990733"
+    },
+    "sustain": {
+      "path": "states/waiting/sustain",
+      "frame_count": 7,
+      "durations_ms": [
+        190,
+        260,
+        100,
+        140,
+        240,
+        280,
+        190
+      ],
+      "duration_ms": 1400,
+      "mode": "loop",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "a8a2f95ca4b18e98ee79f6eaa34f57da94e5e14da22cb2616f0f22afca990733",
+      "last_sha256": "a8a2f95ca4b18e98ee79f6eaa34f57da94e5e14da22cb2616f0f22afca990733"
+    },
+    "exit": {
+      "path": "states/waiting/exit",
+      "frame_count": 5,
+      "durations_ms": [
+        140,
+        160,
+        160,
+        160,
+        120
+      ],
+      "duration_ms": 740,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "a8a2f95ca4b18e98ee79f6eaa34f57da94e5e14da22cb2616f0f22afca990733",
+      "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+    }
+  },
+  "demo": "states/waiting/demo-transparent.gif",
+  "transparent_demo": "states/waiting/demo-transparent.gif",
+  "demo_duration_ms": 8700,
+  "pivot": [
+    96,
+    202
+  ],
+  "demo_sustain_cycles": 4,
+  "repeat_policy": "repeat_sustain_only_until_exit_requested"
+}

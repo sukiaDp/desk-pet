@@ -1,0 +1,82 @@
+{
+  "id": "startled-avert",
+  "name": "被叫到吓一跳",
+  "mode": "oneshot",
+  "entry_anchor_source_frame": 1,
+  "exit_anchor_source_frame": 7,
+  "sustain_source_order": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "sustain_source_kind": "existing_in_state_subset",
+  "semantic_revision": "2.0",
+  "phases": {
+    "enter": {
+      "path": "states/startled-avert/enter",
+      "frame_count": 5,
+      "durations_ms": [
+        90,
+        80,
+        70,
+        70,
+        90
+      ],
+      "duration_ms": 400,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+      "last_sha256": "e322b5442b0c6b4835d57d942068d8d95b0f7e190c8b394101f46348a2062b63"
+    },
+    "sustain": {
+      "path": "states/startled-avert/sustain",
+      "frame_count": 7,
+      "durations_ms": [
+        100,
+        150,
+        160,
+        180,
+        220,
+        230,
+        240
+      ],
+      "duration_ms": 1280,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "e322b5442b0c6b4835d57d942068d8d95b0f7e190c8b394101f46348a2062b63",
+      "last_sha256": "7995edf88ad295a9ed4fcba4cc7fd41cec3bcb4a74d5f61dcf5a4a25d81a7b96"
+    },
+    "exit": {
+      "path": "states/startled-avert/exit",
+      "frame_count": 5,
+      "durations_ms": [
+        140,
+        160,
+        160,
+        160,
+        120
+      ],
+      "duration_ms": 740,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "7995edf88ad295a9ed4fcba4cc7fd41cec3bcb4a74d5f61dcf5a4a25d81a7b96",
+      "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+    }
+  },
+  "demo": "states/startled-avert/demo-transparent.gif",
+  "transparent_demo": "states/startled-avert/demo-transparent.gif",
+  "demo_duration_ms": 4160,
+  "pivot": [
+    96,
+    202
+  ],
+  "demo_sustain_cycles": 1,
+  "repeat_policy": "play_once_then_exit"
+}

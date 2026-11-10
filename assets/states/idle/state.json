@@ -1,0 +1,74 @@
+{
+  "id": "idle",
+  "name": "默认待机",
+  "mode": "loop",
+  "entry_anchor_source_frame": 0,
+  "exit_anchor_source_frame": 0,
+  "sustain_source_order": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    0
+  ],
+  "sustain_source_kind": "existing_in_state_subset",
+  "semantic_revision": "2.0",
+  "phases": {
+    "enter": {
+      "path": "states/idle/enter",
+      "frame_count": 1,
+      "durations_ms": [
+        100
+      ],
+      "duration_ms": 100,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+      "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+    },
+    "sustain": {
+      "path": "states/idle/sustain",
+      "frame_count": 7,
+      "durations_ms": [
+        220,
+        280,
+        100,
+        100,
+        280,
+        350,
+        230
+      ],
+      "duration_ms": 1560,
+      "mode": "loop",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+      "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+    },
+    "exit": {
+      "path": "states/idle/exit",
+      "frame_count": 1,
+      "durations_ms": [
+        100
+      ],
+      "duration_ms": 100,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+      "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+    }
+  },
+  "demo": "states/idle/demo-transparent.gif",
+  "transparent_demo": "states/idle/demo-transparent.gif",
+  "demo_duration_ms": 8090,
+  "pivot": [
+    96,
+    202
+  ],
+  "demo_sustain_cycles": 4,
+  "repeat_policy": "repeat_sustain_only_until_exit_requested"
+}

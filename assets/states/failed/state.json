@@ -1,0 +1,78 @@
+{
+  "id": "failed",
+  "name": "失落低头",
+  "mode": "loop",
+  "entry_anchor_source_frame": 3,
+  "exit_anchor_source_frame": 3,
+  "sustain_source_order": [
+    3,
+    4,
+    3,
+    2,
+    3
+  ],
+  "sustain_source_kind": "existing_in_state_subset",
+  "semantic_revision": "2.0",
+  "phases": {
+    "enter": {
+      "path": "states/failed/enter",
+      "frame_count": 5,
+      "durations_ms": [
+        120,
+        160,
+        160,
+        160,
+        140
+      ],
+      "duration_ms": 740,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+      "last_sha256": "b843200ecc481073df911eb17db051ebb12cab6488df9991a24db05dab8f7f09"
+    },
+    "sustain": {
+      "path": "states/failed/sustain",
+      "frame_count": 5,
+      "durations_ms": [
+        250,
+        420,
+        320,
+        420,
+        250
+      ],
+      "duration_ms": 1660,
+      "mode": "loop",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "b843200ecc481073df911eb17db051ebb12cab6488df9991a24db05dab8f7f09",
+      "last_sha256": "b843200ecc481073df911eb17db051ebb12cab6488df9991a24db05dab8f7f09"
+    },
+    "exit": {
+      "path": "states/failed/exit",
+      "frame_count": 5,
+      "durations_ms": [
+        140,
+        160,
+        160,
+        160,
+        120
+      ],
+      "duration_ms": 740,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "b843200ecc481073df911eb17db051ebb12cab6488df9991a24db05dab8f7f09",
+      "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+    }
+  },
+  "demo": "states/failed/demo-transparent.gif",
+  "transparent_demo": "states/failed/demo-transparent.gif",
+  "demo_duration_ms": 9680,
+  "pivot": [
+    96,
+    202
+  ],
+  "demo_sustain_cycles": 4,
+  "repeat_policy": "repeat_sustain_only_until_exit_requested"
+}

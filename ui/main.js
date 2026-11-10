@@ -39,9 +39,10 @@ async function loadClip(key, meta) {
 async function load() {
   neutral = await img('neutral-N.png');
   const st = await json('状态参数.json').catch(() => ({ states: [] }));
+  const ex = await json('extra-states.json').catch(() => ({ states: [] }));   // 提裙礼、被夸后藏脸、无聊等待
   const gz = await json('gaze/gaze.json').catch(() => ({ variants: [] }));
   await Promise.all([
-    ...st.states.map(s => loadClip(s.id, s)),
+    ...[...st.states, ...ex.states].map(s => loadClip(s.id, s)),
     ...gz.variants.map(v => loadClip('gaze:' + v.angle_degrees, v)),
   ]);
 }
@@ -63,7 +64,8 @@ function gazeClip(a) {
 let ccState = 'idle', gaze = null;          // 目标
 let temp = null;                             // 临时动作 { key, until? }：开场小动作、随机小动作
 let drag = null, dragUntil = 0;              // 拖动时左右跑
-let idleSince = 0, nextRandom = 0;
+let idleSince = 0, nextRandom = 0, waitingSince = 0, sessions = null, praised = null;
+let BORED_MS = 60e3;   // 等你回复超过 1 分钟还没人理 → 无聊等待
 let cur = null, phase = 'sustain', idx = 0, flip = false, until = 0;
 let frame = null;                            // 当前帧，供点穿判断
 
@@ -88,7 +90,8 @@ function targetKey(now) {
       }
     }
   }
-  const k = ANIM[ccState];
+  let k = ANIM[ccState];
+  if (ccState === 'waiting' && now - waitingSince > BORED_MS && clips['bored-wait']) k = 'bored-wait';
   return clips[k] ? { key: k, flip: false } : (clips.idle ? { key: 'idle', flip: false } : null);
 }
 
@@ -189,8 +192,17 @@ async function poll() {
       log(`cc ${ccState} -> ${r.state}`);
       if (INTRO[r.state] && clips[INTRO[r.state]]) temp = { key: INTRO[r.state] };
       if (r.state === 'idle') idleSince = performance.now();
+      if (r.state === 'waiting') waitingSince = performance.now();
     }
     ccState = r.state;
+    const now = performance.now();
+    // 新开了 CC 会话：行个提裙礼
+    const total = Object.values(r.counts).reduce((a, b) => a + b, 0);
+    if (sessions !== null && total > sessions) { temp = { key: 'modest-curtsy', until: now + 3500 }; log('新会话'); }
+    sessions = total;
+    // 被夸了：藏脸
+    if (praised !== null && r.praised > praised) { temp = { key: 'hidden-blush', until: now + 4500 }; log('被夸'); }
+    praised = r.praised;
     // 气泡：最要紧的状态（多个就 ×N），其他会话在忙的话补上，例如「等你回复 +2 工作中」
     const n = r.counts[ccState] || 0;
     const others = Object.entries(r.counts).filter(([k, v]) => k !== ccState && k !== 'idle' && v > 0);
@@ -202,10 +214,11 @@ async function poll() {
 
 invoke('pet_config').then(([k, debug]) => {
   K = k; cv.width = 200 * K; cv.height = 240 * K;
-  if (debug) { DEBUG = true; SIT_MS = 8e3; SLEEP_MS = 16e3; RANDOM_MS = [3e3, 4e3]; }
+  if (debug) { DEBUG = true; SIT_MS = 8e3; SLEEP_MS = 16e3; RANDOM_MS = [3e3, 4e3]; BORED_MS = 8e3; }
 }).then(load).then(() => {
   idleSince = performance.now(); nextRandom = idleSince + RANDOM_MS[0];
-  log(`loaded ${Object.keys(clips).filter(k => !k.startsWith('gaze:'))}`);
+  temp = { key: 'modest-curtsy', until: idleSince + 3500 };   // 启动时行个礼
+  log(`loaded ${Object.keys(clips).filter(k => !k.startsWith('gaze:'))} | ${Object.keys(clips).filter(k => k.startsWith('gaze:')).length} 个视线方向`);
   frame = { img: neutral, ms: 200 }; draw();
   const loop = now => { step(now); requestAnimationFrame(loop); };
   requestAnimationFrame(loop);

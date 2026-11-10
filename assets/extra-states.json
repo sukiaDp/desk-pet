@@ -1,0 +1,131 @@
+{
+ "note": "三个附加包（提裙礼、被夸后藏脸、无聊等待）整理后的参数，格式同 状态参数.json",
+ "states": [
+  {
+   "id": "modest-curtsy",
+   "name": "提裙礼",
+   "mode": "loop",
+   "phases": {
+    "enter": {
+     "path": "states/modest-curtsy/enter",
+     "frame_count": 4,
+     "durations_ms": [
+      250,
+      160,
+      190,
+      220
+     ]
+    },
+    "sustain": {
+     "path": "states/modest-curtsy/sustain",
+     "frame_count": 9,
+     "durations_ms": [
+      420,
+      330,
+      380,
+      280,
+      320,
+      360,
+      100,
+      180,
+      170
+     ]
+    },
+    "exit": {
+     "path": "states/modest-curtsy/exit",
+     "frame_count": 4,
+     "durations_ms": [
+      200,
+      190,
+      160,
+      350
+     ]
+    }
+   }
+  },
+  {
+   "id": "hidden-blush",
+   "name": "被夸后藏脸",
+   "mode": "loop",
+   "phases": {
+    "enter": {
+     "path": "states/hidden-blush/enter",
+     "frame_count": 5,
+     "durations_ms": [
+      160,
+      160,
+      160,
+      160,
+      180
+     ]
+    },
+    "sustain": {
+     "path": "states/hidden-blush/sustain",
+     "frame_count": 7,
+     "durations_ms": [
+      500,
+      220,
+      320,
+      240,
+      450,
+      110,
+      650
+     ]
+    },
+    "exit": {
+     "path": "states/hidden-blush/exit",
+     "frame_count": 5,
+     "durations_ms": [
+      180,
+      160,
+      160,
+      160,
+      180
+     ]
+    }
+   }
+  },
+  {
+   "id": "bored-wait",
+   "name": "无聊等待",
+   "mode": "loop",
+   "phases": {
+    "enter": {
+     "path": "states/bored-wait/enter",
+     "frame_count": 5,
+     "durations_ms": [
+      220,
+      180,
+      180,
+      180,
+      250
+     ]
+    },
+    "sustain": {
+     "path": "states/bored-wait/sustain",
+     "frame_count": 7,
+     "durations_ms": [
+      380,
+      390,
+      430,
+      270,
+      130,
+      470,
+      400
+     ]
+    },
+    "exit": {
+     "path": "states/bored-wait/exit",
+     "frame_count": 5,
+     "durations_ms": [
+      250,
+      180,
+      180,
+      180,
+      250
+     ]
+    }
+   }
+  }
+ ]
+}

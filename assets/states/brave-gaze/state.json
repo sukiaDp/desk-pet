@@ -1,0 +1,76 @@
+{
+  "id": "brave-gaze",
+  "name": "鼓起勇气对视",
+  "mode": "loop",
+  "entry_anchor_source_frame": 5,
+  "exit_anchor_source_frame": 5,
+  "sustain_source_order": [
+    5,
+    6,
+    7,
+    5
+  ],
+  "sustain_source_kind": "existing_in_state_subset",
+  "semantic_revision": "2.0",
+  "phases": {
+    "enter": {
+      "path": "states/brave-gaze/enter",
+      "frame_count": 5,
+      "durations_ms": [
+        120,
+        160,
+        160,
+        160,
+        140
+      ],
+      "duration_ms": 740,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241",
+      "last_sha256": "a0f6c242f518fcd570809a28e3eced376a07663c8edd9e563bdd34eb441a3fbb"
+    },
+    "sustain": {
+      "path": "states/brave-gaze/sustain",
+      "frame_count": 4,
+      "durations_ms": [
+        420,
+        110,
+        850,
+        430
+      ],
+      "duration_ms": 1810,
+      "mode": "loop",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "a0f6c242f518fcd570809a28e3eced376a07663c8edd9e563bdd34eb441a3fbb",
+      "last_sha256": "a0f6c242f518fcd570809a28e3eced376a07663c8edd9e563bdd34eb441a3fbb"
+    },
+    "exit": {
+      "path": "states/brave-gaze/exit",
+      "frame_count": 5,
+      "durations_ms": [
+        140,
+        160,
+        160,
+        160,
+        120
+      ],
+      "duration_ms": 740,
+      "mode": "oneshot",
+      "strip": "strip.png",
+      "gif": "clip.gif",
+      "first_sha256": "a0f6c242f518fcd570809a28e3eced376a07663c8edd9e563bdd34eb441a3fbb",
+      "last_sha256": "a98bee14db6297f7e09292818a7d1107152d55a4121bcb9fb4e4e203dee82241"
+    }
+  },
+  "demo": "states/brave-gaze/demo-transparent.gif",
+  "transparent_demo": "states/brave-gaze/demo-transparent.gif",
+  "demo_duration_ms": 10110,
+  "pivot": [
+    96,
+    202
+  ],
+  "demo_sustain_cycles": 4,
+  "repeat_policy": "repeat_sustain_only_until_exit_requested"
+}

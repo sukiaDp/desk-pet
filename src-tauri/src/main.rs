@@ -51,15 +51,17 @@ fn set_through(window: WebviewWindow, on: bool) {
 fn cc_state() -> serde_json::Value {
     let now = SystemTime::now();
     let mut counts = std::collections::BTreeMap::<String, u32>::new();
+    let mut praised = 0f64;   // 最近一次被夸的时间（mod 写入的毫秒时间戳）
     if let Ok(rd) = fs::read_dir(sessions_dir()) {
         for ent in rd.flatten() {
             let p = ent.path();
             let age = ent.metadata().and_then(|m| m.modified()).ok()
                 .and_then(|m| now.duration_since(m).ok()).unwrap_or_default().as_secs();
-            let state = fs::read_to_string(&p).ok()
+            let v = fs::read_to_string(&p).ok()
                 .and_then(|s| serde_json::from_str::<serde_json::Value>(&s).ok())
-                .and_then(|v| v["state"].as_str().map(String::from))
                 .unwrap_or_default();
+            let state = v["state"].as_str().unwrap_or_default().to_string();
+            praised = praised.max(v["praised"].as_f64().unwrap_or(0.0));
             if state == "ended" || age > 86400 { let _ = fs::remove_file(&p); continue; }
             if age > 180 { continue; }
             let state = if (state == "done" || state == "error") && age > 120 { "idle".to_string() } else { state };
@@ -68,7 +70,7 @@ fn cc_state() -> serde_json::Value {
     }
     let top = ["waiting", "error", "working", "reading", "done", "idle"]
         .into_iter().find(|s| counts.contains_key(*s)).unwrap_or("idle");
-    serde_json::json!({ "state": top, "counts": counts })
+    serde_json::json!({ "state": top, "counts": counts, "praised": praised })
 }
 
 fn main() {
