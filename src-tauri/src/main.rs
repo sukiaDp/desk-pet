@@ -49,6 +49,9 @@ fn set_through(window: WebviewWindow, on: bool) {
 /// 完成/出错 超过 2 分钟回落为空闲。
 #[tauri::command]
 fn cc_state() -> serde_json::Value {
+    if std::env::var("DESK_PET_GHOST").is_ok() {
+        return serde_json::json!({"state":"idle", "counts":{}, "praised":0});
+    }
     let now = SystemTime::now();
     let mut counts = std::collections::BTreeMap::<String, u32>::new();
     let mut praised = 0f64;   // 最近一次被夸的时间（mod 写入的毫秒时间戳）
@@ -81,7 +84,10 @@ fn main() {
             let k = scale();
             let _ = win.set_size(PhysicalSize::new(200 * k, 240 * k));
             // 默认放在主屏右下角
-            if let Ok(Some(m)) = win.primary_monitor() {
+            if std::env::var("DESK_PET_GHOST").is_ok() {
+                let _ = win.set_position(PhysicalPosition::new(3000, 3800));
+                let _ = win.set_title("desk-pet-ghost");
+            } else if let Ok(Some(m)) = win.primary_monitor() {
                 let (s, sz) = (m.position(), m.size());
                 let _ = win.set_position(PhysicalPosition::new(
                     s.x + sz.width as i32 - 60 - 200 * k as i32, s.y + sz.height as i32 - 80 - 240 * k as i32));

@@ -1,0 +1,353 @@
+KWin Support Information:
+The following information should be used when requesting support on e.g. https://forum.kde.org.
+It provides information about the currently running instance, which options are used,
+what OpenGL driver and which effects are running.
+Please post the information provided underneath this introductory text to a paste bin service
+like https://paste.kde.org instead of pasting into support threads.
+
+==========================
+
+Version
+=======
+KWin version: 5.24.7
+Qt Version: 5.15.3
+Qt compile version: 5.15.3
+XCB compile version: 1.14
+
+Operation Mode: X11 only
+
+Build Options
+=============
+KWIN_BUILD_DECORATIONS: yes
+KWIN_BUILD_TABBOX: yes
+KWIN_BUILD_ACTIVITIES: yes
+HAVE_X11_XCB: yes
+HAVE_EPOXY_GLX: yes
+HAVE_WAYLAND_EGL: yes
+
+X11
+===
+Vendor: The X.Org Foundation
+Vendor Release: 12101004
+Protocol Version/Revision: 11/0
+SHAPE: yes; Version: 0x11
+RANDR: yes; Version: 0x14
+DAMAGE: yes; Version: 0x11
+Composite: yes; Version: 0x4
+RENDER: yes; Version: 0xb
+XFIXES: yes; Version: 0x50
+SYNC: yes; Version: 0x31
+GLX: yes; Version: 0x0
+
+Decoration
+==========
+Plugin: org.kde.breeze
+Theme: 
+Plugin recommends border size: None
+Blur: 0
+onAllDesktopsAvailable: true
+alphaChannelSupported: true
+closeOnDoubleClickOnMenu: false
+decorationButtonsLeft: 0, 2
+decorationButtonsRight: 6, 3, 4, 5
+borderSize: 0
+gridUnit: 14
+font: Noto Sans,10,-1,0,50,0,0,0,0,0
+smallSpacing: 3
+largeSpacing: 14
+
+Platform
+==========
+Name: KWin::X11StandalonePlatform
+
+Cursor
+======
+themeName: breeze_cursors
+themeSize: 24
+
+Options
+=======
+focusPolicy: 0
+xwaylandCrashPolicy: 
+xwaylandMaxCrashCount: 3
+nextFocusPrefersMouse: false
+clickRaise: true
+autoRaise: false
+autoRaiseInterval: 0
+delayFocusInterval: 0
+shadeHover: false
+shadeHoverInterval: 250
+separateScreenFocus: false
+activeMouseScreen: true
+placement: 6
+focusPolicyIsReasonable: true
+borderSnapZone: 10
+windowSnapZone: 10
+centerSnapZone: 0
+snapOnlyWhenOverlapping: false
+rollOverDesktops: true
+focusStealingPreventionLevel: 1
+operationTitlebarDblClick: 5000
+operationMaxButtonLeftClick: 5000
+operationMaxButtonMiddleClick: 5015
+operationMaxButtonRightClick: 5014
+commandActiveTitlebar1: 0
+commandActiveTitlebar2: 28
+commandActiveTitlebar3: 2
+commandInactiveTitlebar1: 4
+commandInactiveTitlebar2: 28
+commandInactiveTitlebar3: 2
+commandWindow1: 7
+commandWindow2: 8
+commandWindow3: 8
+commandWindowWheel: 28
+commandAll1: 10
+commandAll2: 3
+commandAll3: 14
+keyCmdAllModKey: 16777250
+condensedTitle: false
+electricBorderMaximize: true
+electricBorderTiling: true
+electricBorderCornerRatio: 0.25
+borderlessMaximizedWindows: false
+killPingTimeout: 5000
+hideUtilityWindowsForInactive: true
+compositingMode: 1
+useCompositing: true
+hiddenPreviews: 1
+glSmoothScale: 2
+glStrictBinding: false
+glStrictBindingFollowsDriver: true
+glPreferBufferSwap: 99
+glPlatformInterface: 1
+windowsBlockCompositing: true
+latencyPolicy: 
+renderTimeEstimator: 
+
+Screen Edges
+============
+desktopSwitching: false
+desktopSwitchingMovingClients: false
+cursorPushBackDistance: 1x1
+timeThreshold: 150
+reActivateThreshold: 350
+actionTopLeft: 0
+actionTop: 0
+actionTopRight: 0
+actionRight: 0
+actionBottomRight: 0
+actionBottom: 0
+actionBottomLeft: 0
+actionLeft: 0
+
+Screens
+=======
+Multi-Head: no
+Active screen follows mouse:  yes
+Number of Screens: 3
+
+Screen 0:
+---------
+Name: DP-2
+Geometry: 3840,2160,3840x2160
+Scale: 1
+Refresh Rate: 59996
+Screen 1:
+---------
+Name: HDMI-0
+Geometry: 3935,0,3840x2160
+Scale: 1
+Refresh Rate: 59996
+Screen 2:
+---------
+Name: DP-0
+Geometry: 0,2160,3840x2160
+Scale: 1
+Refresh Rate: 60000
+
+Compositing
+===========
+Compositing is active
+Compositing Type: OpenGL
+OpenGL vendor string: NVIDIA Corporation
+OpenGL renderer string: NVIDIA GeForce RTX 4090 D/PCIe/SSE2
+OpenGL version string: 3.1.0 NVIDIA 580.178.04
+OpenGL platform interface: GLX
+OpenGL shading language version string: 1.40 NVIDIA via Cg compiler
+Driver: NVIDIA
+Driver version: 580.178.4
+GPU class: Unknown
+OpenGL version: 3.1
+GLSL version: 1.40
+X server version: 1.21.1
+Linux kernel version: 6.8
+Direct rendering: Requires strict binding: no
+GLSL shaders:  yes
+Texture NPOT support:  yes
+Virtual Machine:  no
+OpenGL 2 Shaders are used
+
+Loaded Effects:
+---------------
+kwin4_effect_sessionquit
+kwin4_effect_logout
+kwin4_effect_dialogparent
+kwin4_effect_login
+kwin4_effect_maximize
+kwin4_effect_squash
+kwin4_effect_fullscreen
+kwin4_effect_frozenapp
+kwin4_effect_windowaperture
+kwin4_effect_morphingpopups
+kwin4_effect_scale
+kwin4_effect_fadingpopups
+zoom
+slidingpopups
+colorpicker
+desktopgrid
+slide
+screenshot
+highlightwindow
+overview
+presentwindows
+blur
+contrast
+screenedge
+startupfeedback
+kscreen
+
+Currently Active Effects:
+-------------------------
+blur
+contrast
+
+Effect Settings:
+----------------
+kwin4_effect_sessionquit:
+pluginId: kwin4_effect_sessionquit
+isActiveFullScreenEffect: false
+
+kwin4_effect_logout:
+pluginId: kwin4_effect_logout
+isActiveFullScreenEffect: false
+
+kwin4_effect_dialogparent:
+pluginId: kwin4_effect_dialogparent
+isActiveFullScreenEffect: false
+
+kwin4_effect_login:
+pluginId: kwin4_effect_login
+isActiveFullScreenEffect: false
+
+kwin4_effect_maximize:
+pluginId: kwin4_effect_maximize
+isActiveFullScreenEffect: false
+
+kwin4_effect_squash:
+pluginId: kwin4_effect_squash
+isActiveFullScreenEffect: false
+
+kwin4_effect_fullscreen:
+pluginId: kwin4_effect_fullscreen
+isActiveFullScreenEffect: false
+
+kwin4_effect_frozenapp:
+pluginId: kwin4_effect_frozenapp
+isActiveFullScreenEffect: false
+
+kwin4_effect_windowaperture:
+pluginId: kwin4_effect_windowaperture
+isActiveFullScreenEffect: false
+
+kwin4_effect_morphingpopups:
+pluginId: kwin4_effect_morphingpopups
+isActiveFullScreenEffect: false
+
+kwin4_effect_scale:
+pluginId: kwin4_effect_scale
+isActiveFullScreenEffect: false
+
+kwin4_effect_fadingpopups:
+pluginId: kwin4_effect_fadingpopups
+isActiveFullScreenEffect: false
+
+zoom:
+zoomFactor: 1.2
+mousePointer: 0
+mouseTracking: 0
+focusTrackingEnabled: false
+textCaretTrackingEnabled: false
+focusDelay: 350
+moveFactor: 20
+targetZoom: 1
+
+slidingpopups:
+slideInDuration: 150
+slideOutDuration: 250
+
+colorpicker:
+
+desktopgrid:
+zoomDuration: 300
+border: 10
+desktopNameAlignment: 0
+layoutMode: 1
+customLayoutRows: 2
+usePresentWindows: true
+
+slide:
+duration: 500
+horizontalGap: 45
+verticalGap: 20
+slideDocks: false
+slideBackground: true
+
+screenshot:
+
+highlightwindow:
+
+overview:
+animationDuration: 200
+layout: 1
+blurBackground: true
+
+presentwindows:
+layoutMode: 1
+showCaptions: true
+showIcons: true
+doNotCloseWindows: false
+ignoreMinimized: false
+accuracy: 20
+fillGaps: true
+fadeDuration: 150
+showPanel: true
+leftButtonWindow: 1
+rightButtonWindow: 2
+middleButtonWindow: 0
+leftButtonDesktop: 2
+middleButtonDesktop: 0
+rightButtonDesktop: 0
+
+blur:
+
+contrast:
+
+screenedge:
+
+startupfeedback:
+type: 3
+
+kscreen:
+
+
+Loaded Plugins:
+---------------
+kwin5_plugin_krunner
+kwin5_plugin_nightcolor
+
+Available Plugins:
+------------------
+kwin5_plugin_colord
+kwin5_plugin_krunner
+kwin5_plugin_nightcolor
+

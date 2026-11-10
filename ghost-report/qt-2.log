@@ -1,0 +1,227 @@
+QSettings::value: Empty key passed
+QSettings::value: Empty key passed
+
+xwininfo: Window id: 0x600006 "ghost-control-qt"
+
+  Absolute upper-left X:  3000
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x7e
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600005 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: yes
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +3000+3800  -4575+3800  -4575-280  +3000-280
+  -geometry 200x240+3000+3800
+
+系统拖动 True
+
+xwininfo: Window id: 0x600006 "ghost-control-qt"
+
+  Absolute upper-left X:  2856
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x7e
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600005 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: yes
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2856+3800  -4719+3800  -4719-280  +2856-280
+  -geometry 200x240+2856+3800
+
+{"截图": "qt-2-0-0", "窗口": [2856, 3800, 200, 240], "时间": 1794286094.7173092}
+
+xwininfo: Window id: 0x600006 "ghost-control-qt"
+
+  Absolute upper-left X:  2856
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x7e
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600005 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: yes
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2856+3800  -4719+3800  -4719-280  +2856-280
+  -geometry 200x240+2856+3800
+
+{"截图": "qt-2-0-1", "窗口": [2856, 3800, 200, 240], "时间": 1794286097.7350278}
+
+xwininfo: Window id: 0x600006 "ghost-control-qt"
+
+  Absolute upper-left X:  2856
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x7e
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600005 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: yes
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2856+3800  -4719+3800  -4719-280  +2856-280
+  -geometry 200x240+2856+3800
+
+系统拖动 True
+
+xwininfo: Window id: 0x600006 "ghost-control-qt"
+
+  Absolute upper-left X:  3000
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x7e
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600005 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: yes
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +3000+3800  -4575+3800  -4575-280  +3000-280
+  -geometry 200x240+3000+3800
+
+{"截图": "qt-2-1-0", "窗口": [3000, 3800, 200, 240], "时间": 1794286102.5246818}
+
+xwininfo: Window id: 0x600006 "ghost-control-qt"
+
+  Absolute upper-left X:  3000
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x7e
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600005 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: yes
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +3000+3800  -4575+3800  -4575-280  +3000-280
+  -geometry 200x240+3000+3800
+
+{"截图": "qt-2-1-1", "窗口": [3000, 3800, 200, 240], "时间": 1794286105.5850556}
+
+xwininfo: Window id: 0x600006 "ghost-control-qt"
+
+  Absolute upper-left X:  3000
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x7e
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600005 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: yes
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +3000+3800  -4575+3800  -4575-280  +3000-280
+  -geometry 200x240+3000+3800
+
+系统拖动 True
+
+xwininfo: Window id: 0x600006 "ghost-control-qt"
+
+  Absolute upper-left X:  2856
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x7e
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600005 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: yes
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2856+3800  -4719+3800  -4719-280  +2856-280
+  -geometry 200x240+2856+3800
+
+{"截图": "qt-2-2-0", "窗口": [2856, 3800, 200, 240], "时间": 1794286110.3131657}
+
+xwininfo: Window id: 0x600006 "ghost-control-qt"
+
+  Absolute upper-left X:  2856
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x7e
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600005 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: yes
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2856+3800  -4719+3800  -4719-280  +2856-280
+  -geometry 200x240+2856+3800
+
+{"截图": "qt-2-2-1", "窗口": [2856, 3800, 200, 240], "时间": 1794286113.3133843}

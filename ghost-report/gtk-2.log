@@ -1,0 +1,222 @@
+
+xwininfo: Window id: 0x600003 "ghost-control-gtk"
+
+  Absolute upper-left X:  3000
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600002 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +3000+3800  -4575+3800  -4575-280  +3000-280
+  -geometry 200x240+3000+3800
+
+
+xwininfo: Window id: 0x600003 "ghost-control-gtk"
+
+  Absolute upper-left X:  2624
+  Absolute upper-left Y:  3930
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600002 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2624+3930  -4951+3930  -4951-150  +2624-150
+  -geometry 200x240+2624+3930
+
+{"截图": "gtk-2-0-0", "窗口": [2624, 3930, 200, 240], "时间": 1794286068.7786207}
+
+xwininfo: Window id: 0x600003 "ghost-control-gtk"
+
+  Absolute upper-left X:  2624
+  Absolute upper-left Y:  3930
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600002 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2624+3930  -4951+3930  -4951-150  +2624-150
+  -geometry 200x240+2624+3930
+
+{"截图": "gtk-2-0-1", "窗口": [2624, 3930, 200, 240], "时间": 1794286071.4628704}
+
+xwininfo: Window id: 0x600003 "ghost-control-gtk"
+
+  Absolute upper-left X:  2624
+  Absolute upper-left Y:  3930
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600002 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2624+3930  -4951+3930  -4951-150  +2624-150
+  -geometry 200x240+2624+3930
+
+
+xwininfo: Window id: 0x600003 "ghost-control-gtk"
+
+  Absolute upper-left X:  2768
+  Absolute upper-left Y:  3930
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600002 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2768+3930  -4807+3930  -4807-150  +2768-150
+  -geometry 200x240+2768+3930
+
+{"截图": "gtk-2-1-0", "窗口": [2768, 3930, 200, 240], "时间": 1794286076.1414554}
+
+xwininfo: Window id: 0x600003 "ghost-control-gtk"
+
+  Absolute upper-left X:  2768
+  Absolute upper-left Y:  3930
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600002 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2768+3930  -4807+3930  -4807-150  +2768-150
+  -geometry 200x240+2768+3930
+
+{"截图": "gtk-2-1-1", "窗口": [2768, 3930, 200, 240], "时间": 1794286079.1458125}
+
+xwininfo: Window id: 0x600003 "ghost-control-gtk"
+
+  Absolute upper-left X:  2768
+  Absolute upper-left Y:  3930
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600002 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2768+3930  -4807+3930  -4807-150  +2768-150
+  -geometry 200x240+2768+3930
+
+
+xwininfo: Window id: 0x600003 "ghost-control-gtk"
+
+  Absolute upper-left X:  2624
+  Absolute upper-left Y:  3930
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600002 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2624+3930  -4951+3930  -4951-150  +2624-150
+  -geometry 200x240+2624+3930
+
+{"截图": "gtk-2-2-0", "窗口": [2624, 3930, 200, 240], "时间": 1794286083.8785887}
+
+xwininfo: Window id: 0x600003 "ghost-control-gtk"
+
+  Absolute upper-left X:  2624
+  Absolute upper-left Y:  3930
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600002 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2624+3930  -4951+3930  -4951-150  +2624-150
+  -geometry 200x240+2624+3930
+
+{"截图": "gtk-2-2-1", "窗口": [2624, 3930, 200, 240], "时间": 1794286086.988441}

@@ -1,0 +1,240 @@
+
+** (ghost-control.py:159): WARNING **: 12:50:51.464: Disabled hardware acceleration because GTK failed to initialize GL: 无法创建 GL 上下文.
+file:///:1:42701: CONSOLE LOG 气泡alpha=255
+
+xwininfo: Window id: 0x60000a "ghost-control-webkit"
+
+  Absolute upper-left X:  3000
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600009 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +3000+3800  -4575+3800  -4575-280  +3000-280
+  -geometry 200x240+3000+3800
+
+系统拖动
+file:///:1:42701: CONSOLE LOG 气泡alpha=0
+file:///:1:42701: CONSOLE LOG 气泡alpha=255
+
+xwininfo: Window id: 0x60000a "ghost-control-webkit"
+
+  Absolute upper-left X:  2856
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600009 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2856+3800  -4719+3800  -4719-280  +2856-280
+  -geometry 200x240+2856+3800
+
+file:///:1:42701: CONSOLE LOG 气泡alpha=0
+{"截图": "webkit-6-0-0", "窗口": [2856, 3800, 200, 240], "时间": 1794286257.5941296}
+file:///:1:42701: CONSOLE LOG 气泡alpha=255
+
+xwininfo: Window id: 0x60000a "ghost-control-webkit"
+
+  Absolute upper-left X:  2856
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600009 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2856+3800  -4719+3800  -4719-280  +2856-280
+  -geometry 200x240+2856+3800
+
+{"截图": "webkit-6-0-1", "窗口": [2856, 3800, 200, 240], "时间": 1794286260.6200457}
+
+xwininfo: Window id: 0x60000a "ghost-control-webkit"
+
+  Absolute upper-left X:  2856
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600009 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2856+3800  -4719+3800  -4719-280  +2856-280
+  -geometry 200x240+2856+3800
+
+系统拖动
+file:///:1:42701: CONSOLE LOG 气泡alpha=0
+file:///:1:42701: CONSOLE LOG 气泡alpha=255
+
+xwininfo: Window id: 0x60000a "ghost-control-webkit"
+
+  Absolute upper-left X:  3000
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600009 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +3000+3800  -4575+3800  -4575-280  +3000-280
+  -geometry 200x240+3000+3800
+
+{"截图": "webkit-6-1-0", "窗口": [3000, 3800, 200, 240], "时间": 1794286265.3383093}
+file:///:1:42701: CONSOLE LOG 气泡alpha=0
+file:///:1:42701: CONSOLE LOG 气泡alpha=255
+
+xwininfo: Window id: 0x60000a "ghost-control-webkit"
+
+  Absolute upper-left X:  3000
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600009 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +3000+3800  -4575+3800  -4575-280  +3000-280
+  -geometry 200x240+3000+3800
+
+{"截图": "webkit-6-1-1", "窗口": [3000, 3800, 200, 240], "时间": 1794286268.343673}
+
+xwininfo: Window id: 0x60000a "ghost-control-webkit"
+
+  Absolute upper-left X:  3000
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600009 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +3000+3800  -4575+3800  -4575-280  +3000-280
+  -geometry 200x240+3000+3800
+
+系统拖动
+file:///:1:42701: CONSOLE LOG 气泡alpha=0
+file:///:1:42701: CONSOLE LOG 气泡alpha=255
+
+xwininfo: Window id: 0x60000a "ghost-control-webkit"
+
+  Absolute upper-left X:  2856
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600009 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2856+3800  -4719+3800  -4719-280  +2856-280
+  -geometry 200x240+2856+3800
+
+{"截图": "webkit-6-2-0", "窗口": [2856, 3800, 200, 240], "时间": 1794286273.0700037}
+file:///:1:42701: CONSOLE LOG 气泡alpha=0
+file:///:1:42701: CONSOLE LOG 气泡alpha=255
+
+xwininfo: Window id: 0x60000a "ghost-control-webkit"
+
+  Absolute upper-left X:  2856
+  Absolute upper-left Y:  3800
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 200
+  Height: 240
+  Depth: 32
+  Visual: 0x82
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x600009 (not installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +2856+3800  -4719+3800  -4719-280  +2856-280
+  -geometry 200x240+2856+3800
+
+{"截图": "webkit-6-2-1", "窗口": [2856, 3800, 200, 240], "时间": 1794286276.0657973}
