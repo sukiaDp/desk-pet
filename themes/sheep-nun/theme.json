@@ -1,7 +1,7 @@
 {
   "name": "羊角修女",
   "assets": "assets",
-  "font": "Noto Serif CJK SC",
+  "font": "ZCOOL XiaoWei",
   "avatar": [
     68,
     2,
@@ -46,5 +46,11 @@
     "no_session": "没有开 /desk-pet 的会话：在 CC 里输入 /desk-pet",
     "seal": ""
   },
-  "look": "book"
+  "look": "book",
+  "font_latin": "IM FELL English",
+  "font_files": [
+    "fonts/ZCOOLXiaoWei-Regular.ttf",
+    "fonts/IMFeENrm28P.ttf",
+    "fonts/IMFeENit28P.ttf"
+  ]
 }
