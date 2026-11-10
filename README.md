@@ -26,7 +26,7 @@
 | 空闲 | 站着（idle）；偶尔随机 prayer-peek / sneeze / brave-gaze |
 | 闲置 30 分钟以上 | 随机 sit-swing（坐下晃脚）或 sleepy-nod（打瞌睡），保持到 CC 有动静或点她 |
 | 拖动 | running-left / running-right |
-| 点她一下 | modest-curtsy（提裙礼），之后 8 秒视线跟着鼠标（16 个方向） |
+| 点她一下 | modest-curtsy（提裙礼），头顶气泡收起（状态变了再出来），之后 8 秒视线跟着鼠标（16 个方向） |
 | 你发给 CC 的消息里有夸奖（谢谢、辛苦、厉害、nice…） | hidden-blush（被夸后藏脸） |
 
 缺素材的动画会自动跳过。调试：`DESK_PET_DEBUG=1` 时把动画切换打到 stderr，并把计时缩短（无聊等待 8 秒、闲置 12 秒）。

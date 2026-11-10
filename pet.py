@@ -119,6 +119,7 @@ class Pet(QWidget):
 
         # 目标
         self.cc, self.bubble = 'idle', ''
+        self.bubble_off = False                  # 点过一下：这条气泡先收起，内容变了再出来
         self.gaze, self.gaze_until = None, 0     # 点击后的一小段时间里视线跟着鼠标
         self.done_since = 0
         self.temp = None                         # 临时动作 {key, until, urgent, random}
@@ -250,7 +251,7 @@ class Pet(QWidget):
             p.setTransform(QTransform(-1, 0, 0, 1, W, 0), True)
         p.drawImage(0, 0, self.frame)
         p.resetTransform()
-        if self.bubble:
+        if self.bubble and not self.bubble_off:
             p.scale(K, K)
             p.setRenderHint(QPainter.Antialiasing)
             p.setPen(QColor(0, 0, 0, 50))
@@ -304,6 +305,8 @@ class Pet(QWidget):
             self.temp = {'key': 'modest-curtsy', 'until': now + CLICK_CURTSY_MS, 'urgent': True}
             self.gaze_until = now + CLICK_CURTSY_MS + CLICK_GAZE_MS
             self.idle_since, self.long_idle = now, None   # 点醒她，重新计闲置
+            self.bubble_off = True
+            self.render()
             log('点击')
         self.press = None
 
@@ -332,7 +335,7 @@ class Pet(QWidget):
         others = ''.join(f' +{v} {LABEL.get(k, k)}' for k, v in counts.items() if k not in (state, 'idle') and v > 0)
         text = LABEL[state] + (f' ×{n}' if n > 1 else '') + others if LABEL[state] else ''
         if text != self.bubble:
-            self.bubble = text
+            self.bubble, self.bubble_off = text, False
             self.render()
 
 
