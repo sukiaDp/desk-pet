@@ -41,8 +41,10 @@ QScrollBar:vertical {{ background: transparent; width: 6px; }}
 QScrollBar::handle:vertical {{ background: {rgba(c['gold'], 0.55)}; border-radius: 3px; min-height: 30px; }}
 QScrollBar::add-line, QScrollBar::sub-line {{ height: 0; }}
 QScrollBar::add-page, QScrollBar::sub-page {{ background: transparent; }}
-QWidget#chat QLabel[role="user"] {{ color: {c['rubric']}; font-style: italic; font-size: 14px; padding: 2px 2px; }}
-QWidget#chat QLabel[role="cc"] {{ color: {c['ink']}; font-size: 14px; padding: 4px 2px; }}
+QWidget#chat QLabel[role="user"] {{ color: {c['rubric']}; font-style: italic; font-size: 14px; padding: 6px 11px;
+  background: {rgba(c['rubric'], 0.06)}; border: 1px solid {rgba(c['rubric'], 0.35)}; border-radius: 4px; }}
+QWidget#chat QLabel[role="cc"] {{ color: {c['ink']}; font-size: 14px; padding: 8px 12px;
+  background: {rgba('#fffaf0', 0.45)}; border: 1px solid {rgba(c['gold'], 0.45)}; border-radius: 4px; }}
 QWidget#chat QLabel[role="user"][pending="true"] {{ color: {c['muted']}; }}
 QWidget#chat QLabel#meta {{ color: {c['muted']}; font-size: 11px; font-style: italic; }}
 QWidget#chat QLabel#optdesc {{ color: {c['muted']}; font-size: 12px; }}
@@ -383,7 +385,7 @@ class ChatWindow(QWidget):
         f.setItalic(self.book and role == 'user')
         fm = QFontMetrics(f)
         longest = max((fm.horizontalAdvance(line) for line in b.text().splitlines() or ['']), default=0)
-        b.setMinimumWidth(min(longest + 24, maxw))
+        b.setMinimumWidth(min(int(longest * 1.05) + round(44 * self.k), maxw))   # 加上文字框的内边距和边框，留点余量
         if self.book and role == 'user':
             b.setAlignment(Qt.AlignRight)
         b.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
