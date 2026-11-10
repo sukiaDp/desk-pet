@@ -13,12 +13,17 @@
 `~/.cache/desk-pet/sessions/<会话id>.json`，每 60 秒写一次心跳。桌宠每秒汇总一次，优先级：等你回复 > 出错 > 工作中 > 完成 > 空闲。
 3 分钟没有心跳的会话不计入；完成、出错超过 2 分钟算空闲。
 
-| CC 状态 | 动画 |
+| 情况 | 动画 |
 | --- | --- |
 | 工作中 | running（专注工作） |
-| 等你回复（权限、提问） | waiting |
-| 完成 | waving |
+| 查看中（读文件、搜索） | review（低头检查） |
+| 等你回复（权限、提问） | 先 startled-avert（吓一跳），再 waiting |
+| 完成 | 先 jumping（跳一下），再 waving（招手） |
 | 出错 | failed |
-| 空闲 | idle + 视线跟随 |
+| 空闲 | idle；鼠标动时视线跟随；偶尔随机 prayer-peek / sneeze / brave-gaze |
+| 空闲且鼠标 2 分钟没动 | sit-swing（坐下晃脚），5 分钟 sleepy-nod（打瞌睡） |
+| 拖动 | running-left / running-right |
+
+缺素材的动画会自动跳过。调试：`DESK_PET_DEBUG=1` 时把动画切换打到 stderr，并把空闲计时缩成 8 秒 / 16 秒。
 
 开关 mod：`claude plugin disable desk-pet@local-mods` / `claude plugin enable desk-pet@local-mods`（新会话生效）。

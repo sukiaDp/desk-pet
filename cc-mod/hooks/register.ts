@@ -1,11 +1,13 @@
 import type { Register } from 'claude-code'
 
 // 每个会话一个状态文件：~/.cache/desk-pet/sessions/<sessionId>.json
-// state: working | waiting | done | error | idle | ended
+// state: working | reading | waiting | done | error | idle | ended
 // 每 60 秒心跳重写一次；桌宠把 3 分钟没更新的文件当作已退出。
-type State = 'working' | 'waiting' | 'done' | 'error' | 'idle' | 'ended'
+type State = 'working' | 'reading' | 'waiting' | 'done' | 'error' | 'idle' | 'ended'
 
 const ASKS_USER = new Set(['AskUserQuestion', 'ExitPlanMode'])
+// 只读、查找类工具：桌宠播「低头检查」
+const READS = new Set(['Read', 'Grep', 'Glob', 'LS', 'NotebookRead', 'WebFetch', 'WebSearch'])
 
 let current: State = 'idle'
 let file: string | undefined
@@ -59,9 +61,10 @@ export const register: Register = on => {
 
   on('tool.call', async ($, e, next) => {
     const main = !(e as any).agentId
-    if (main) await write($, ASKS_USER.has(e.tool) ? 'waiting' : 'working')
+    if (main) await write($, ASKS_USER.has(e.tool) ? 'waiting' : READS.has(e.tool) ? 'reading' : 'working')
     const r = await next(e)
-    if (main && current !== 'working') await write($, 'working')
+    // 只有等人（权限、提问）结束要改回工作中；查看中保持到下一个工具或回合结束，免得来回切
+    if (main && current === 'waiting') await write($, 'working')
     return r
   })
 }

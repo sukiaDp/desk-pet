@@ -30,9 +30,13 @@ fn scale() -> u32 {
     std::env::var("DESK_PET_SCALE").ok().and_then(|v| v.parse().ok()).filter(|v| *v >= 1).unwrap_or(1)
 }
 
-/// 放大倍数（整数，最近邻）。窗口物理尺寸 = 200x240 × 倍数
+/// [放大倍数（整数，最近邻；窗口物理尺寸 = 200x240 × 倍数）, 调试开关]
 #[tauri::command]
-fn pet_scale() -> u32 { scale() }
+fn pet_config() -> (u32, bool) { (scale(), std::env::var("DESK_PET_DEBUG").is_ok()) }
+
+/// 调试日志（DESK_PET_DEBUG 时前端会调用）
+#[tauri::command]
+fn log(msg: String) { eprintln!("[pet] {msg}"); }
 
 /// 透明处点穿：前端按像素 alpha 判断后调用
 #[tauri::command]
@@ -40,7 +44,7 @@ fn set_through(window: WebviewWindow, on: bool) {
     let _ = window.set_ignore_cursor_events(on);
 }
 
-/// 汇总所有 CC 会话：等待 > 出错 > 工作中 > 完成 > 空闲。
+/// 汇总所有 CC 会话：等待 > 出错 > 工作中 > 查看中 > 完成 > 空闲。
 /// 3 分钟没心跳的文件视为会话已退出；ended 和 1 天前的文件顺手删掉。
 /// 完成/出错 超过 2 分钟回落为空闲。
 #[tauri::command]
@@ -62,14 +66,14 @@ fn cc_state() -> serde_json::Value {
             *counts.entry(state).or_default() += 1;
         }
     }
-    let top = ["waiting", "error", "working", "done", "idle"]
+    let top = ["waiting", "error", "working", "reading", "done", "idle"]
         .into_iter().find(|s| counts.contains_key(*s)).unwrap_or("idle");
     serde_json::json!({ "state": top, "counts": counts })
 }
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![read_asset, set_through, cc_state, pet_scale])
+        .invoke_handler(tauri::generate_handler![read_asset, set_through, cc_state, pet_config, log])
         .setup(|app| {
             let win = app.get_webview_window("main").unwrap();
             let k = scale();
@@ -97,15 +101,19 @@ fn main() {
                 })
                 .build(app)?;
 
-            // 全局鼠标位置（相对窗口，物理像素）推给前端：用于视线和点穿判断
+            // 鼠标位置推给前端：相对窗口 + 屏幕绝对坐标（物理像素）：用于视线和点穿判断
             let w = win.clone();
             thread::spawn(move || loop {
                 thread::sleep(Duration::from_millis(40));
                 if let (Ok(c), Ok(p)) = (w.cursor_position(), w.outer_position()) {
-                    let _ = w.emit("cursor", (c.x - p.x as f64, c.y - p.y as f64));
+                    let _ = w.emit("cursor", (c.x - p.x as f64, c.y - p.y as f64, c.x, c.y));
                 }
             });
             Ok(())
+        })
+        .on_window_event(|w, ev| {
+            // 窗口位置变化（拖动）推给前端，用来播左右跑
+            if let tauri::WindowEvent::Moved(p) = ev { let _ = w.emit("moved", (p.x, p.y)); }
         })
         .run(tauri::generate_context!())
         .expect("desk-pet failed");
